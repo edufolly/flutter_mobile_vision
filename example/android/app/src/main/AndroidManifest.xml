@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.github.edufolly.fluttermobilevisionexample">
 
+    <!-- CAMERA permission -->
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <!-- The INTERNET permission is required for development. Specifically,
          flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
@@ -16,6 +20,15 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="flutter_mobile_vision_example"
         android:icon="@mipmap/ic_launcher">
+
+        <!-- Add more things -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
