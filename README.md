@@ -2,9 +2,66 @@
 
 Flutter implementation for Google Mobile Vision.
 
-## Getting Started
+Based on [Google Mobile Vision](https://developers.google.com/vision/).
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+[Android Samples](https://github.com/googlesamples/android-vision) -=- [iOS Samples](https://github.com/googlesamples/ios-vision)
 
-For help on editing plugin code, view the [documentation](https://flutter.io/platform-plugins/#edit-code).
+Liked? :star: Star the repo to support the project!
+
+## Features
+
+* [ ] Android
+   * [ ] Barcode Scan
+      * [x] Simple scan.
+   * [ ] Detect Faces
+   * [ ] Recognize Text
+
+* [ ] iOS
+   * [ ] Barcode Scan
+   * [ ] Detect Faces
+   * [ ] Recognize Text
+
+## Usage
+
+[Example](https://github.com/edufolly/flutter_mobile_vision/blob/master/example/lib/main.dart)
+
+To use this plugin :
+
+* add the dependency to your [pubspec.yaml](https://github.com/iampawan/Flute-Music-Player/blob/master/example/pubspec.yaml) file:
+
+```yaml
+  dependencies:
+    flutter:
+      sdk: flutter
+    flutter_mobile_vision: ^0.0.1
+```
+
+* read a barcode:
+
+```dart
+//...
+String barcode;
+try {
+  barcode = await FlutterMobileVision.scan();
+} on PlatformException {
+  barcode = 'Failed to get barcode.';
+}
+//...
+```
+
+## Android
+
+For Android, you must do the following before you can use the plugin:
+
+* Add the camera permission to your AndroidManifest.xml
+
+    `<uses-feature android:name="android.hardware.camera" />`
+
+    `<uses-permission android:name="android.permission.CAMERA" />`
+
+* Add the Barcode activity to your AndroidManifest.xml
+
+    `<activity android:name="io.github.edufolly.fluttermobilevision.BarcodeCaptureActivity" />`
+
+## iOS
+If you can help, the community thanks. Your fork is needed. :wink:
