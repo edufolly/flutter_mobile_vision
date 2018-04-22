@@ -17,6 +17,9 @@ flutter:
     androidPackage: io.github.edufolly.fluttermobilevision
     pluginClass: FlutterMobileVisionPlugin
 
+environment:
+  sdk: ">=2.0.0-a <3.0.0"
+
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg
