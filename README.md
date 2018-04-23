@@ -16,13 +16,24 @@ Liked? :star: Star the repo to support the project!
       * [x] Toggle torch.
       * [x] Toggle auto focus.
       * [x] Specify types of barcodes that will be read.
-   * [ ] Detect Faces
+      * [x] Tap to capture.
+      * [x] Select barcode type to be scanned.
+      * [ ] Scan multiple barcodes.
    * [ ] Recognize Text
+      * [ ] _Future Tasks_
+   * [ ] Detect Faces
+      * [ ] _Future Tasks_
 
 * [ ] iOS
    * [ ] Barcode Scan
-   * [ ] Detect Faces
+      * [ ] _Future Tasks_
    * [ ] Recognize Text
+      * [ ] _Future Tasks_
+   * [ ] Detect Faces
+      * [ ] _Future Tasks_
+
+## Screenshots
+<img src="docs/flutter_01.png" height="300em"/> <img src="docs/flutter_02.png" height="300em"/> <img src="docs/flutter_03.png" height="300em"/> <img src="docs/flutter_04.png" height="300em"/>
 
 ## Usage
 
@@ -36,23 +47,27 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision: ^0.0.1
+    flutter_mobile_vision:
 ```
 
 * read a barcode:
 
 ```dart
 //...
-String code;
+String displayValue = 'Unknown';
+String rawValue = 'Unknown';
+String format = 'Unknown';
+String valueFormat = 'Unknown';
+
 try {
-  Barcode barcode = await FlutterMobileVision.scan(
-    flash: false,
-    autoFocus: true,
-    formats: Barcode.ALL_FORMATS,
-  );
-  code = barcode.displayValue;
+  Barcode barcode = await FlutterMobileVision.scan();
+  displayValue = barcode.displayValue;
+  rawValue = barcode.rawValue;
+  format = '${barcode.getFormatString()} (${barcode.format})';
+  valueFormat =
+      '${barcode.getValueFormatString()} (${barcode.valueFormat})';
 } on Exception {
-  code = 'Failed to get barcode.';
+  displayValue = 'Failed to get barcode.';
 }
 //...
 ```

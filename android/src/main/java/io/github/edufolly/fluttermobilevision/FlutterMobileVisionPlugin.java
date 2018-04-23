@@ -29,6 +29,14 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private static final int RC_HANDLE_CAMERA_PERM = 2;
     private static final int RC_BARCODE_SCAN = 9010;
 
+    private final Activity activity;
+    private Result result;
+
+    private boolean useFlash = false;
+    private boolean autoFocus = true;
+    private int formats = Barcode.ALL_FORMATS;
+    private boolean waitTap = false;
+
     /**
      * Plugin registration.
      */
@@ -43,20 +51,8 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         registrar.addActivityResultListener(plugin);
     }
 
-
-    private final Activity activity;
-    private Result result;
-    private boolean useFlash = false;
-    private boolean autoFocus = true;
-    private int formats = Barcode.ALL_FORMATS;
-
-
     private FlutterMobileVisionPlugin(Activity activity) {
         this.activity = activity;
-    }
-
-    private String getTag() {
-        return "PrincipalActivity";
     }
 
     @Override
@@ -64,7 +60,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
         final Map<String, Object> arguments = call.arguments();
 
-        if (call.method.equals("scan")) {
+        if ("scan".equals(call.method)) {
             this.result = result;
 
             if (arguments.containsKey("flash")) {
@@ -77,6 +73,10 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
             if (arguments.containsKey("formats")) {
                 formats = (int) arguments.get("formats");
+            }
+
+            if (arguments.containsKey("waitTap")) {
+                waitTap = (boolean) arguments.get("waitTap");
             }
 
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
@@ -96,6 +96,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, autoFocus);
         intent.putExtra(BarcodeCaptureActivity.USE_FLASH, useFlash);
         intent.putExtra(BarcodeCaptureActivity.FORMATS, formats);
+        intent.putExtra(BarcodeCaptureActivity.WAIT_TAP, waitTap);
         activity.startActivityForResult(intent, RC_BARCODE_SCAN);
     }
 
@@ -106,8 +107,6 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 if (intent != null) {
                     Barcode barcode = intent
                             .getParcelableExtra(BarcodeCaptureActivity.BARCODE_OBJECT);
-
-                    Log.d(getTag(), "Barcode read: " + barcode.displayValue);
 
                     Map<String, Object> ret = new HashMap<>();
 
@@ -134,7 +133,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                                               int[] grantResults) {
 
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
-            Log.d(getTag(), "Got unexpected permission result: " + requestCode);
+            result.error("Got unexpected permission result: " + requestCode, null, null);
             return false;
         }
 
@@ -143,8 +142,9 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             return true;
         }
 
-        Log.e(getTag(), "Permission not granted: results len = " + grantResults.length +
-                " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
+        result.error("Permission not granted: results len = " + grantResults.length +
+                        " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"),
+                null, null);
 
         return false;
     }

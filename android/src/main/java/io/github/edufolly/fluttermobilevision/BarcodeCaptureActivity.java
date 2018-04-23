@@ -26,6 +26,8 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -52,6 +54,7 @@ public final class BarcodeCaptureActivity extends Activity
     public static final String AUTO_FOCUS = "AUTO_FOCUS";
     public static final String USE_FLASH = "USE_FLASH";
     public static final String FORMATS = "FORMATS";
+    public static final String WAIT_TAP = "WAIT_TAP";
 
     public static final String BARCODE_OBJECT = "Barcode";
     public static final String ERROR = "Error";
@@ -60,9 +63,9 @@ public final class BarcodeCaptureActivity extends Activity
     private CameraSourcePreview mPreview;
     private GraphicOverlay<BarcodeGraphic> mGraphicOverlay;
 
-//    helper objects for detecting taps and pinches.
-//    private ScaleGestureDetector scaleGestureDetector;
-//    private GestureDetector gestureDetector;
+    private GestureDetector gestureDetector;
+
+    private boolean waitTap;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -78,9 +81,10 @@ public final class BarcodeCaptureActivity extends Activity
             mPreview = findViewById(R.id.barcode_preview);
             mGraphicOverlay = findViewById(R.id.barcode_graphic_overlay);
 
-            // read parameters from the intent used to launch the activity.
             boolean autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             boolean useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
+
+            waitTap = getIntent().getBooleanExtra(WAIT_TAP, false);
 
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {
@@ -89,21 +93,21 @@ public final class BarcodeCaptureActivity extends Activity
                 throw new BarcodeException("Camera permission is needed.");
             }
 
-//            gestureDetector = new GestureDetector(this, new CaptureGestureListener());
-//            scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
+            gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    return onTap(e.getRawX(), e.getRawY()) || super.onSingleTapConfirmed(e);
+                }
+            });
         } catch (Exception e) {
             onError(e);
         }
     }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent e) {
-//        boolean b = scaleGestureDetector.onTouchEvent(e);
-//
-//        boolean c = gestureDetector.onTouchEvent(e);
-//
-//        return b || c || super.onTouchEvent(e);
-//    }
+    @Override
+    public boolean onTouchEvent(MotionEvent e) {
+        return gestureDetector.onTouchEvent(e) || super.onTouchEvent(e);
+    }
 
     @SuppressLint("InlinedApi")
     private void createCameraSource(boolean autoFocus, boolean useFlash) throws BarcodeException {
@@ -195,115 +199,53 @@ public final class BarcodeCaptureActivity extends Activity
         }
     }
 
-//    /**
-//     * onTap returns the tapped barcode result to the calling Activity.
-//     *
-//     * @param rawX - the raw position of the tap
-//     * @param rawY - the raw position of the tap.
-//     * @return true if the activity is ending.
-//     */
-//    private boolean onTap(float rawX, float rawY) {
-//        // Find tap point in preview frame coordinates.
-//        int[] location = new int[2];
-//        mGraphicOverlay.getLocationOnScreen(location);
-//        float x = (rawX - location[0]) / mGraphicOverlay.getWidthScaleFactor();
-//        float y = (rawY - location[1]) / mGraphicOverlay.getHeightScaleFactor();
-//
-//        // Find the barcode whose center is closest to the tapped point.
-//        Barcode best = null;
-//        float bestDistance = Float.MAX_VALUE;
-//        for (BarcodeGraphic graphic : mGraphicOverlay.getGraphics()) {
-//            Barcode barcode = graphic.getBarcode();
-//            if (barcode.getBoundingBox().contains((int) x, (int) y)) {
-//                // Exact hit, no need to keep looking.
-//                best = barcode;
-//                break;
-//            }
-//            float dx = x - barcode.getBoundingBox().centerX();
-//            float dy = y - barcode.getBoundingBox().centerY();
-//            float distance = (dx * dx) + (dy * dy);  // actually squared distance
-//            if (distance < bestDistance) {
-//                best = barcode;
-//                bestDistance = distance;
-//            }
-//        }
-//
-//        if (best != null) {
-//            Intent data = new Intent();
-//            data.putExtra(BARCODE_OBJECT, best);
-//            setResult(CommonStatusCodes.SUCCESS, data);
-//            finish();
-//            return true;
-//        }
-//        return false;
-//    }
+    private boolean onTap(float rawX, float rawY) {
+        if (!waitTap) {
+            return false;
+        }
 
-//    private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {
-//        @Override
-//        public boolean onSingleTapConfirmed(MotionEvent e) {
-//            return onTap(e.getRawX(), e.getRawY()) || super.onSingleTapConfirmed(e);
-//        }
-//    }
+        // Find tap point in preview frame coordinates.
+        int[] location = new int[2];
+        mGraphicOverlay.getLocationOnScreen(location);
+        float x = (rawX - location[0]) / mGraphicOverlay.getWidthScaleFactor();
+        float y = (rawY - location[1]) / mGraphicOverlay.getHeightScaleFactor();
 
-//    private class ScaleListener implements ScaleGestureDetector.OnScaleGestureListener {
-//
-//        /**
-//         * Responds to scaling events for a gesture in progress.
-//         * Reported by pointer motion.
-//         *
-//         * @param detector The detector reporting the event - use this to
-//         *                 retrieve extended info about event state.
-//         * @return Whether or not the detector should consider this event
-//         * as handled. If an event was not handled, the detector
-//         * will continue to accumulate movement until an event is
-//         * handled. This can be useful if an application, for example,
-//         * only wants to update scaling factors if the change is
-//         * greater than 0.01.
-//         */
-//        @Override
-//        public boolean onScale(ScaleGestureDetector detector) {
-//            return false;
-//        }
-//
-//        /**
-//         * Responds to the beginning of a scaling gesture. Reported by
-//         * new pointers going down.
-//         *
-//         * @param detector The detector reporting the event - use this to
-//         *                 retrieve extended info about event state.
-//         * @return Whether or not the detector should continue recognizing
-//         * this gesture. For example, if a gesture is beginning
-//         * with a focal point outside of a region where it makes
-//         * sense, onScaleBegin() may return false to ignore the
-//         * rest of the gesture.
-//         */
-//        @Override
-//        public boolean onScaleBegin(ScaleGestureDetector detector) {
-//            return true;
-//        }
-//
-//        /**
-//         * Responds to the end of a scale gesture. Reported by existing
-//         * pointers going up.
-//         * <p/>
-//         * Once a scale has ended, {@link ScaleGestureDetector#getFocusX()}
-//         * and {@link ScaleGestureDetector#getFocusY()} will return focal point
-//         * of the pointers remaining on the screen.
-//         *
-//         * @param detector The detector reporting the event - use this to
-//         *                 retrieve extended info about event state.
-//         */
-//        @Override
-//        public void onScaleEnd(ScaleGestureDetector detector) {
-//            mCameraSource.doZoom(detector.getScaleFactor());
-//        }
-//    }
+        // Find the barcode whose center is closest to the tapped point.
+        Barcode best = null;
+        float bestDistance = Float.MAX_VALUE;
+        for (BarcodeGraphic graphic : mGraphicOverlay.getGraphics()) {
+            Barcode barcode = graphic.getBarcode();
+            if (barcode.getBoundingBox().contains((int) x, (int) y)) {
+                // Exact hit, no need to keep looking.
+                best = barcode;
+                break;
+            }
+            float dx = x - barcode.getBoundingBox().centerX();
+            float dy = y - barcode.getBoundingBox().centerY();
+            float distance = (dx * dx) + (dy * dy);  // actually squared distance
+            if (distance < bestDistance) {
+                best = barcode;
+                bestDistance = distance;
+            }
+        }
+
+        if (best != null) {
+            Intent data = new Intent();
+            data.putExtra(BARCODE_OBJECT, best);
+            setResult(CommonStatusCodes.SUCCESS, data);
+            finish();
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void onBarcodeDetected(Barcode barcode) {
-        Intent data = new Intent();
-        data.putExtra(BARCODE_OBJECT, barcode);
-        setResult(CommonStatusCodes.SUCCESS, data);
-        finish();
+        if (!waitTap) {
+            Intent data = new Intent();
+            data.putExtra(BARCODE_OBJECT, barcode);
+            setResult(CommonStatusCodes.SUCCESS, data);
+            finish();
+        }
     }
 }

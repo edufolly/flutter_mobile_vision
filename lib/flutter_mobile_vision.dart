@@ -10,11 +10,13 @@ class FlutterMobileVision {
     bool flash: false,
     bool autoFocus: true,
     int formats: Barcode.ALL_FORMATS,
+    bool waitTap: false,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
       'autoFocus': autoFocus,
       'formats': formats,
+      'waitTap': waitTap,
     };
 
     final Map<dynamic, dynamic> map =
@@ -39,6 +41,7 @@ class Barcode {
   static const int UPC_E = 1024;
   static const int PDF417 = 2048;
   static const int AZTEC = 4096;
+
   static const int CONTACT_INFO = 1;
   static const int EMAIL = 2;
   static const int ISBN = 3;
@@ -52,87 +55,63 @@ class Barcode {
   static const int CALENDAR_EVENT = 11;
   static const int DRIVER_LICENSE = 12;
 
+  static const Map mapFormat = {
+    ALL_FORMATS: 'ALL FORMATS',
+    CODE_128: 'CODE 128',
+    CODE_39: 'CODE 39',
+    CODE_93: 'CODE 93',
+    CODABAR: 'CODABAR',
+    DATA_MATRIX: 'DATA MATRIX',
+    EAN_13: 'EAN 13',
+    EAN_8: 'EAN 8',
+    ITF: 'ITF',
+    QR_CODE: 'QR CODE',
+    UPC_A: 'UPC A',
+    UPC_E: 'UPC E',
+    PDF417: 'PDF417',
+    AZTEC: 'AZTEC',
+  };
+
+  static const Map mapValueFormat = {
+    CONTACT_INFO: 'CONTACT INFO',
+    EMAIL: 'EMAIL',
+    ISBN: 'ISBN',
+    PHONE: 'PHONE',
+    PRODUCT: 'PRODUCT',
+    SMS: 'SMS',
+    TEXT: 'TEXT',
+    URL: 'URL',
+    WIFI: 'WIFI',
+    GEO: 'GEO',
+    CALENDAR_EVENT: 'CALENDAR EVENT',
+    DRIVER_LICENSE: 'DRIVER LICENSE',
+  };
+
   final String displayValue;
   final String rawValue;
-  final int valueFormat;
   final int format;
+  final int valueFormat;
 
   Barcode.fromMap(Map map)
       : displayValue = map['displayValue'],
         rawValue = map['rawValue'],
-        valueFormat = map['valueFormat'],
-        format = map['format'];
+        format = map['format'],
+        valueFormat = map['valueFormat'];
 
   Map<String, dynamic> toMap() {
     return {
       'displayValue': displayValue,
       'rawValue': rawValue,
-      'valueFormat': valueFormat,
       'format': format,
+      'valueFormat': valueFormat,
     };
   }
 
   String getFormatString() {
-    switch (format) {
-      case CODE_128:
-        return "CODE 128";
-      case CODE_39:
-        return 'CODE 39';
-      case CODE_93:
-        return 'CODE 93';
-      case CODABAR:
-        return 'CODABAR';
-      case DATA_MATRIX:
-        return 'DATA MATRIX';
-      case EAN_13:
-        return 'EAN 13';
-      case EAN_8:
-        return 'EAN 8';
-      case ITF:
-        return 'ITF';
-      case QR_CODE:
-        return 'QR CODE';
-      case UPC_A:
-        return 'UPC A';
-      case UPC_E:
-        return 'UPC E';
-      case PDF417:
-        return 'PDF417';
-      case AZTEC:
-        return 'AZTEC';
-      default:
-        return 'UNKNOWN';
-    }
+    return mapFormat[format] ?? 'UNKNOWN';
   }
 
   String getValueFormatString() {
-    switch (valueFormat) {
-      case CONTACT_INFO:
-        return 'CONTACT INFO';
-      case EMAIL:
-        return 'EMAIL';
-      case ISBN:
-        return 'ISBN';
-      case PHONE:
-        return 'PHONE';
-      case PRODUCT:
-        return 'PRODUCT';
-      case SMS:
-        return 'SMS';
-      case TEXT:
-        return 'TEXT';
-      case URL:
-        return 'URL';
-      case WIFI:
-        return 'WIFI';
-      case GEO:
-        return 'GEO';
-      case CALENDAR_EVENT:
-        return 'CALENDAR EVENT';
-      case DRIVER_LICENSE:
-        return 'DRIVER LICENSE';
-      default:
-        return 'UNKNOWN';
-    }
+    return mapValueFormat[valueFormat] ?? 'UNKNOWN';
   }
 }

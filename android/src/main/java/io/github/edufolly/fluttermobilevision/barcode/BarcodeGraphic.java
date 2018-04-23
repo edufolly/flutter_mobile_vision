@@ -32,13 +32,17 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 public class BarcodeGraphic extends GraphicOverlay.Graphic {
 
     private static final int COLOR_CHOICES[] = {
-            Color.GREEN
+            Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW
     };
-    private static int mCurrentColorIndex = 0;
+    private static int mCurrentColorIndex;
     private int mId;
     private Paint mRectPaint;
     //    private Paint mTextPaint;
     private volatile Barcode mBarcode;
+
+    static {
+        mCurrentColorIndex = 0;
+    }
 
     BarcodeGraphic(GraphicOverlay overlay) {
         super(overlay);

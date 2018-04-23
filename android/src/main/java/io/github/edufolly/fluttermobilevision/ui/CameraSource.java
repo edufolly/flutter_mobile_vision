@@ -91,35 +91,11 @@ public class CameraSource {
      */
     private static final float ASPECT_RATIO_TOLERANCE = 0.01f;
 
-    @StringDef({
-            Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE,
-            Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO,
-            Camera.Parameters.FOCUS_MODE_AUTO,
-            Camera.Parameters.FOCUS_MODE_EDOF,
-            Camera.Parameters.FOCUS_MODE_FIXED,
-            Camera.Parameters.FOCUS_MODE_INFINITY,
-            Camera.Parameters.FOCUS_MODE_MACRO
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface FocusMode {
-    }
-
-    @StringDef({
-            Camera.Parameters.FLASH_MODE_ON,
-            Camera.Parameters.FLASH_MODE_OFF,
-            Camera.Parameters.FLASH_MODE_AUTO,
-            Camera.Parameters.FLASH_MODE_RED_EYE,
-            Camera.Parameters.FLASH_MODE_TORCH
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    private @interface FlashMode {
-    }
 
     private Context mContext;
 
     private final Object mCameraLock = new Object();
 
-    // Guarded by mCameraLock
     private Camera mCamera;
 
     private int mFacing = CAMERA_FACING_BACK;
@@ -137,7 +113,6 @@ public class CameraSource {
     private float mRequestedFps = 30.0f;
     private int mRequestedPreviewWidth = 1024;
     private int mRequestedPreviewHeight = 768;
-
 
     private String mFocusMode = null;
     private String mFlashMode = null;
@@ -161,6 +136,31 @@ public class CameraSource {
      * native code later (avoids a potential copy).
      */
     private Map<byte[], ByteBuffer> mBytesToByteBuffer = new HashMap<>();
+
+
+    @StringDef({
+            Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE,
+            Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO,
+            Camera.Parameters.FOCUS_MODE_AUTO,
+            Camera.Parameters.FOCUS_MODE_EDOF,
+            Camera.Parameters.FOCUS_MODE_FIXED,
+            Camera.Parameters.FOCUS_MODE_INFINITY,
+            Camera.Parameters.FOCUS_MODE_MACRO
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface FocusMode {
+    }
+
+    @StringDef({
+            Camera.Parameters.FLASH_MODE_ON,
+            Camera.Parameters.FLASH_MODE_OFF,
+            Camera.Parameters.FLASH_MODE_AUTO,
+            Camera.Parameters.FLASH_MODE_RED_EYE,
+            Camera.Parameters.FLASH_MODE_TORCH
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface FlashMode {
+    }
 
     //==============================================================================================
     // Builder
@@ -788,14 +788,12 @@ public class CameraSource {
         // setting mFocusMode to the one set in the params
         mFocusMode = parameters.getFocusMode();
 
-        if (mFlashMode != null) {
-            if (parameters.getSupportedFlashModes() != null) {
-                if (parameters.getSupportedFlashModes().contains(
-                        mFlashMode)) {
-                    parameters.setFlashMode(mFlashMode);
-                } else {
-                    Log.i(TAG, "Camera flash mode: " + mFlashMode + " is not supported on this device.");
-                }
+        if (mFlashMode != null && parameters.getSupportedFlashModes() != null) {
+            if (parameters.getSupportedFlashModes().contains(
+                    mFlashMode)) {
+                parameters.setFlashMode(mFlashMode);
+            } else {
+                Log.i(TAG, "Camera flash mode: " + mFlashMode + " is not supported on this device.");
             }
         }
 
@@ -1003,6 +1001,7 @@ public class CameraSource {
                 break;
             default:
                 Log.e(TAG, "Bad rotation value: " + rotation);
+                break;
         }
 
         CameraInfo cameraInfo = new CameraInfo();
@@ -1100,7 +1099,7 @@ public class CameraSource {
          * has completed, which is managed in camera source's release method above.
          */
         @SuppressLint("Assert")
-        void release() {
+        private void release() {
             assert (mProcessingThread.getState() == State.TERMINATED);
             mDetector.release();
             mDetector = null;
@@ -1109,7 +1108,7 @@ public class CameraSource {
         /**
          * Marks the runnable as active/not active.  Signals any blocked threads to continue.
          */
-        void setActive(boolean active) {
+        private void setActive(boolean active) {
             synchronized (mLock) {
                 mActive = active;
                 mLock.notifyAll();
@@ -1121,7 +1120,7 @@ public class CameraSource {
          * (if present) back to the camera, and keeps a pending reference to the frame data for
          * future use.
          */
-        void setNextFrame(byte[] data, Camera camera) {
+        private void setNextFrame(byte[] data, Camera camera) {
             synchronized (mLock) {
                 if (mPendingFrameData != null) {
                     camera.addCallbackBuffer(mPendingFrameData.array());
