@@ -4,13 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -35,6 +37,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private boolean useFlash = false;
     private boolean autoFocus = true;
     private int formats = Barcode.ALL_FORMATS;
+    private boolean multiple = false;
     private boolean waitTap = false;
 
     /**
@@ -75,8 +78,16 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 formats = (int) arguments.get("formats");
             }
 
+            if (arguments.containsKey("multiple")) {
+                multiple = (boolean) arguments.get("multiple");
+            }
+
             if (arguments.containsKey("waitTap")) {
                 waitTap = (boolean) arguments.get("waitTap");
+            }
+
+            if (multiple) {
+                waitTap = true;
             }
 
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
@@ -96,6 +107,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, autoFocus);
         intent.putExtra(BarcodeCaptureActivity.USE_FLASH, useFlash);
         intent.putExtra(BarcodeCaptureActivity.FORMATS, formats);
+        intent.putExtra(BarcodeCaptureActivity.MULTIPLE, multiple);
         intent.putExtra(BarcodeCaptureActivity.WAIT_TAP, waitTap);
         activity.startActivityForResult(intent, RC_BARCODE_SCAN);
     }
@@ -105,21 +117,28 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         if (requestCode == RC_BARCODE_SCAN) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (intent != null) {
-                    Barcode barcode = intent
-                            .getParcelableExtra(BarcodeCaptureActivity.BARCODE_OBJECT);
-
-                    Map<String, Object> ret = new HashMap<>();
-
-                    ret.put("displayValue", barcode.displayValue);
-                    ret.put("rawValue", barcode.rawValue);
-                    ret.put("valueFormat", barcode.valueFormat);
-                    ret.put("format", barcode.format);
-
-                    result.success(ret);
-                } else {
-                    result.error("No barcode captured, intent data is null", null, null);
+                    ArrayList<Barcode> barcodes = intent
+                            .getParcelableArrayListExtra(BarcodeCaptureActivity.BARCODE_OBJECT);
+                    if (!barcodes.isEmpty()) {
+                        List<Map<String, Object>> list = new ArrayList<>();
+                        for (Barcode barcode : barcodes) {
+                            Rect rect = barcode.getBoundingBox();
+                            Map<String, Object> ret = new HashMap<>();
+                            ret.put("displayValue", barcode.displayValue);
+                            ret.put("rawValue", barcode.rawValue);
+                            ret.put("valueFormat", barcode.valueFormat);
+                            ret.put("format", barcode.format);
+                            ret.put("top", rect.top);
+                            ret.put("bottom", rect.bottom);
+                            ret.put("left", rect.left);
+                            ret.put("right", rect.right);
+                            list.add(ret);
+                        }
+                        result.success(list);
+                        return true;
+                    }
                 }
-                return true;
+                result.error("No barcode captured, intent data is null", null, null);
             } else if (resultCode == CommonStatusCodes.ERROR) {
                 Exception e = intent.getParcelableExtra(BarcodeCaptureActivity.ERROR);
                 result.error(e.getMessage(), null, e);

@@ -6,23 +6,27 @@ class FlutterMobileVision {
   static const MethodChannel _channel =
       const MethodChannel('flutter_mobile_vision');
 
-  static Future<Barcode> scan({
+  static Future<List<Barcode>> scan({
     bool flash: false,
     bool autoFocus: true,
     int formats: Barcode.ALL_FORMATS,
+    bool multiple: false,
     bool waitTap: false,
   }) async {
+    if (multiple) {
+      waitTap = true;
+    }
     Map<String, dynamic> arguments = {
       'flash': flash,
       'autoFocus': autoFocus,
       'formats': formats,
+      'multiple': multiple,
       'waitTap': waitTap,
     };
 
-    final Map<dynamic, dynamic> map =
-        await _channel.invokeMethod('scan', arguments);
+    final List list = await _channel.invokeMethod('scan', arguments);
 
-    return Barcode.fromMap(map);
+    return list.map((map) => Barcode.fromMap(map)).toList();
   }
 }
 
@@ -91,12 +95,31 @@ class Barcode {
   final String rawValue;
   final int format;
   final int valueFormat;
+  final int top;
+  final int bottom;
+  final int left;
+  final int right;
+
+  Barcode(
+    this.displayValue, {
+    this.rawValue: '',
+    this.format: Barcode.ALL_FORMATS,
+    this.valueFormat: Barcode.TEXT,
+    this.top: 0,
+    this.bottom: 0,
+    this.left: 0,
+    this.right: 0,
+  });
 
   Barcode.fromMap(Map map)
       : displayValue = map['displayValue'],
         rawValue = map['rawValue'],
         format = map['format'],
-        valueFormat = map['valueFormat'];
+        valueFormat = map['valueFormat'],
+        top = map['top'],
+        bottom = map['bottom'],
+        left = map['left'],
+        right = map['right'];
 
   Map<String, dynamic> toMap() {
     return {

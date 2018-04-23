@@ -20,7 +20,8 @@ Liked? :star: Star the repo to support the project!
       * [x] Specify types of barcodes that will be read.
       * [x] Tap to capture.
       * [x] Select barcode type to be scanned.
-      * [ ] Scan multiple barcodes.
+      * [x] Scan multiple barcodes.
+      * [X] Barcode coordinates.
    * [ ] Recognize Text
       * [ ] _Future Tasks_
    * [ ] Detect Faces
