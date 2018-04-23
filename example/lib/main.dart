@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 
 void main() => runApp(new MyApp());
@@ -12,7 +11,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _barcode = 'Unknown';
+  String _displayValue = 'Unknown';
+  String _rawValue = 'Unknown';
+  String _format = 'Unknown';
+  String _valueFormat = 'Unknown';
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: new Scaffold(
         appBar: new AppBar(
-          title: new Text('Plugin example app'),
+          title: new Text('Flutter Mobile Vision'),
         ),
         body: new ListView(
           padding: EdgeInsets.all(40.0),
@@ -34,7 +36,19 @@ class _MyAppState extends State<MyApp> {
             ),
             new Padding(
               padding: const EdgeInsets.only(top: 12.0),
-              child: new Text('Barcode: $_barcode'),
+              child: new Text('Display Value: $_displayValue'),
+            ),
+            new Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: new Text('Raw Value: $_rawValue'),
+            ),
+            new Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: new Text('Format: $_format'),
+            ),
+            new Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: new Text('Value Format: $_valueFormat'),
             ),
           ],
         ),
@@ -43,19 +57,36 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<Null> _scan() async {
-    String barcode;
+    String displayValue = 'Unknow';
+    String rawValue = 'Unknown';
+    String format = 'Unknown';
+    String valueFormat = 'Unknown';
+
     try {
-      barcode = await FlutterMobileVision.scan(
+      Barcode barcode = await FlutterMobileVision.scan(
         flash: false,
+        autoFocus: true,
+        formats: Barcode.ALL_FORMATS,
       );
-    } on PlatformException {
-      barcode = 'Failed to get barcode.';
+
+      print(barcode.toMap());
+
+      displayValue = barcode.displayValue;
+      rawValue = barcode.rawValue;
+      format = '${barcode.getFormatString()} (${barcode.format})';
+      valueFormat =
+          '${barcode.getValueFormatString()} (${barcode.valueFormat})';
+    } on Exception {
+      displayValue = 'Failed to get barcode.';
     }
 
     if (!mounted) return;
 
     setState(() {
-      _barcode = barcode;
+      _displayValue = displayValue;
+      _rawValue = rawValue;
+      _format = format;
+      _valueFormat = valueFormat;
     });
   }
 }

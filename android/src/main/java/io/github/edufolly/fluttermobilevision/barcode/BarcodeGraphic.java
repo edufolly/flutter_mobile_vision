@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.edufolly.fluttermobilevision;
+package io.github.edufolly.fluttermobilevision.barcode;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -29,7 +29,7 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
  * Graphic instance for rendering barcode position, size, and ID within an associated graphic
  * overlay view.
  */
-class BarcodeGraphic extends GraphicOverlay.Graphic {
+public class BarcodeGraphic extends GraphicOverlay.Graphic {
 
     private static final int COLOR_CHOICES[] = {
             Color.GREEN

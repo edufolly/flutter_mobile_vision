@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -46,6 +47,8 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private final Activity activity;
     private Result result;
     private boolean useFlash = false;
+    private boolean autoFocus = true;
+    private int formats = Barcode.ALL_FORMATS;
 
 
     private FlutterMobileVisionPlugin(Activity activity) {
@@ -68,6 +71,14 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 useFlash = (boolean) arguments.get("flash");
             }
 
+            if (arguments.containsKey("autoFocus")) {
+                autoFocus = (boolean) arguments.get("autoFocus");
+            }
+
+            if (arguments.containsKey("formats")) {
+                formats = (int) arguments.get("formats");
+            }
+
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
             if (rc != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new
@@ -82,9 +93,9 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
     private void scanBarcode() {
         Intent intent = new Intent(activity, BarcodeCaptureActivity.class);
-        intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, true);
+        intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, autoFocus);
         intent.putExtra(BarcodeCaptureActivity.USE_FLASH, useFlash);
-        intent.putExtra(BarcodeCaptureActivity.FORMATS, Barcode.QR_CODE);
+        intent.putExtra(BarcodeCaptureActivity.FORMATS, formats);
         activity.startActivityForResult(intent, RC_BARCODE_SCAN);
     }
 
@@ -98,12 +109,21 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
                     Log.d(getTag(), "Barcode read: " + barcode.displayValue);
 
-                    result.success(barcode.displayValue);
+                    Map<String, Object> ret = new HashMap<>();
+
+                    ret.put("displayValue", barcode.displayValue);
+                    ret.put("rawValue", barcode.rawValue);
+                    ret.put("valueFormat", barcode.valueFormat);
+                    ret.put("format", barcode.format);
+
+                    result.success(ret);
                 } else {
-                    Log.e(getTag(), "No barcode captured, intent data is null");
                     result.error("No barcode captured, intent data is null", null, null);
                 }
                 return true;
+            } else if (resultCode == CommonStatusCodes.ERROR) {
+                Exception e = intent.getParcelableExtra(BarcodeCaptureActivity.ERROR);
+                result.error(e.getMessage(), null, e);
             }
         }
         return false;

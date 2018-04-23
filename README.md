@@ -13,6 +13,9 @@ Liked? :star: Star the repo to support the project!
 * [ ] Android
    * [ ] Barcode Scan
       * [x] Simple scan.
+      * [x] Toggle torch.
+      * [x] Toggle auto focus.
+      * [x] Specify types of barcodes that will be read.
    * [ ] Detect Faces
    * [ ] Recognize Text
 
@@ -40,11 +43,16 @@ To use this plugin :
 
 ```dart
 //...
-String barcode;
+String code;
 try {
-  barcode = await FlutterMobileVision.scan();
-} on PlatformException {
-  barcode = 'Failed to get barcode.';
+  Barcode barcode = await FlutterMobileVision.scan(
+    flash: false,
+    autoFocus: true,
+    formats: Barcode.ALL_FORMATS,
+  );
+  code = barcode.displayValue;
+} on Exception {
+  code = 'Failed to get barcode.';
 }
 //...
 ```

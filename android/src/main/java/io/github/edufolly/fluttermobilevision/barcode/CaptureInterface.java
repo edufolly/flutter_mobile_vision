@@ -1,4 +1,4 @@
-package io.github.edufolly.fluttermobilevision;
+package io.github.edufolly.fluttermobilevision.barcode;
 
 import com.google.android.gms.vision.barcode.Barcode;
 
