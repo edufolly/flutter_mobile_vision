@@ -24,8 +24,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
 import android.view.GestureDetector;
@@ -42,7 +40,6 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.github.edufolly.fluttermobilevision.barcode.BarcodeGraphic;
 import io.github.edufolly.fluttermobilevision.barcode.BarcodeGraphicTracker;
