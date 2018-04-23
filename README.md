@@ -1,6 +1,6 @@
 # flutter_mobile_vision
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/26accf32303f4260ab867afb2b664bcd)](https://app.codacy.com/app/edufolly/flutter_mobile_vision?utm_source=github.com&utm_medium=referral&utm_content=edufolly/flutter_mobile_vision&utm_campaign=badger)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/26accf32303f4260ab867afb2b664bcd)](https://app.codacy.com/app/edufolly/flutter_mobile_vision?utm_source=github.com&utm_medium=referral&utm_content=edufolly/flutter_mobile_vision&utm_campaign=badger) [![pub package](https://img.shields.io/pub/v/flutter_mobile_vision.svg)](https://pub.dartlang.org/packages/flutter_mobile_vision)
 
 Flutter implementation for Google Mobile Vision.
 
