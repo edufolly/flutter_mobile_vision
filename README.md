@@ -50,7 +50,7 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision:
+    flutter_mobile_vision: ^0.0.2
 ```
 
 * read a barcode:
