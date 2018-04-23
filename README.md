@@ -21,7 +21,7 @@ Liked? :star: Star the repo to support the project!
       * [x] Tap to capture.
       * [x] Select barcode type to be scanned.
       * [x] Scan multiple barcodes.
-      * [X] Barcode coordinates.
+      * [x] Barcode coordinates.
    * [ ] Recognize Text
       * [ ] _Future Tasks_
    * [ ] Detect Faces
@@ -57,20 +57,17 @@ To use this plugin :
 
 ```dart
 //...
-String displayValue = 'Unknown';
-String rawValue = 'Unknown';
-String format = 'Unknown';
-String valueFormat = 'Unknown';
-
+List<Barcode> barcodes = [];
 try {
-  Barcode barcode = await FlutterMobileVision.scan();
-  displayValue = barcode.displayValue;
-  rawValue = barcode.rawValue;
-  format = '${barcode.getFormatString()} (${barcode.format})';
-  valueFormat =
-      '${barcode.getValueFormatString()} (${barcode.valueFormat})';
+  barcodes = await FlutterMobileVision.scan(
+    flash: _torch,
+    autoFocus: _autoFocus,
+    formats: _onlyFormat,
+    multiple: _multiple,
+    waitTap: _waitTap,
+  );
 } on Exception {
-  displayValue = 'Failed to get barcode.';
+  barcodes.add(new Barcode('Failed to get barcode.'));
 }
 //...
 ```
