@@ -28,6 +28,20 @@ class FlutterMobileVision {
 
     return list.map((map) => Barcode.fromMap(map)).toList();
   }
+
+  static Future<String> read({
+    bool flash: false,
+    bool autoFocus: true,
+  }) async {
+    Map<String, dynamic> arguments = {
+      'flash': flash,
+      'autoFocus': autoFocus,
+    };
+
+    final text = await _channel.invokeMethod('read', arguments);
+
+    return text.toString();
+  }
 }
 
 class Barcode {

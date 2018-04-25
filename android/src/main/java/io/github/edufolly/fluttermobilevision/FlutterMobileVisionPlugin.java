@@ -21,6 +21,8 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity;
+import io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity;
 
 /**
  * FlutterMobileVisionPlugin
@@ -30,6 +32,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
     private static final int RC_HANDLE_CAMERA_PERM = 2;
     private static final int RC_BARCODE_SCAN = 9010;
+    private static final int RC_OCR_READ = 8020;
 
     private final Activity activity;
     private Result result;
@@ -97,6 +100,25 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             } else {
                 scanBarcode();
             }
+        } else if ("read".equals(call.method)) {
+            this.result = result;
+
+            if (arguments.containsKey("flash")) {
+                useFlash = (boolean) arguments.get("flash");
+            }
+
+            if (arguments.containsKey("autoFocus")) {
+                autoFocus = (boolean) arguments.get("autoFocus");
+            }
+
+            int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+            if (rc != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity, new
+                        String[]{Manifest.permission.CAMERA}, RC_HANDLE_CAMERA_PERM);
+            } else {
+                ocrRead();
+            }
+
         } else {
             result.notImplemented();
         }
@@ -110,6 +132,13 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(BarcodeCaptureActivity.MULTIPLE, multiple);
         intent.putExtra(BarcodeCaptureActivity.WAIT_TAP, waitTap);
         activity.startActivityForResult(intent, RC_BARCODE_SCAN);
+    }
+
+    private void ocrRead() {
+        Intent intent = new Intent(activity, OcrCaptureActivity.class);
+        intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, autoFocus);
+        intent.putExtra(BarcodeCaptureActivity.USE_FLASH, useFlash);
+        activity.startActivityForResult(intent, RC_OCR_READ);
     }
 
     @Override
@@ -143,6 +172,21 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 Exception e = intent.getParcelableExtra(BarcodeCaptureActivity.ERROR);
                 result.error(e.getMessage(), null, e);
             }
+        } else if (requestCode == RC_OCR_READ) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (intent != null) {
+                    String text = intent.getStringExtra(OcrCaptureActivity.TEXT_OBJECT);
+
+                    // TODO: Other properties.
+
+                    result.success(text);
+                    return true;
+                }
+                result.error("No text recognized, intent data is null", null, null);
+            } else if (resultCode == CommonStatusCodes.ERROR) {
+                Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
+                result.error(e.getMessage(), null, e);
+            }
         }
         return false;
     }
@@ -157,7 +201,8 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         }
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            scanBarcode();
+            // FIXME: Please!
+            // scanBarcode();
             return true;
         }
 

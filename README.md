@@ -23,7 +23,10 @@ Liked? :star: Star the repo to support the project!
       * [x] Scan multiple barcodes.
       * [x] Barcode coordinates.
    * [ ] Recognize Text
-      * [ ] _Future Tasks_
+      * [ ] Simple OCR *Working in Progress*.
+      * [ ] Multiple recognition.
+      * [ ] Text language.
+      * [ ] Text coordinates.
    * [ ] Detect Faces
       * [ ] _Future Tasks_
 
@@ -36,7 +39,7 @@ Liked? :star: Star the repo to support the project!
       * [ ] _Future Tasks_
 
 ## Screenshots
-<img src="docs/flutter_01.png" height="300em"/> <img src="docs/flutter_02.png" height="300em"/> <img src="docs/flutter_03.png" height="300em"/> <img src="docs/flutter_04.png" height="300em"/>
+<img src="docs/flutter_01.png" height="300em"/> <img src="docs/flutter_02.png" height="300em"/> <img src="docs/flutter_03.png" height="300em"/> <img src="docs/flutter_04.png" height="300em"/> <img src="docs/flutter_06.png" height="300em"/>
 
 ## Usage
 
@@ -44,7 +47,7 @@ Liked? :star: Star the repo to support the project!
 
 To use this plugin :
 
-* add the dependency to your [pubspec.yaml](https://github.com/iampawan/Flute-Music-Player/blob/master/example/pubspec.yaml) file:
+* add the dependency to your `pubspec.yaml` file:
 
 ```yaml
   dependencies:
@@ -53,7 +56,9 @@ To use this plugin :
     flutter_mobile_vision: ^0.0.2
 ```
 
-* read a barcode:
+-----
+
+## Barcode
 
 ```dart
 //...
@@ -72,7 +77,7 @@ try {
 //...
 ```
 
-## Android
+### Android
 
 For Android, you must do the following before you can use the plugin:
 
@@ -86,5 +91,42 @@ For Android, you must do the following before you can use the plugin:
 
     `<activity android:name="io.github.edufolly.fluttermobilevision.BarcodeCaptureActivity" />`
 
-## iOS
+### iOS
+
+If you can help, the community thanks. Your fork is needed. :wink:
+
+------
+
+## OCR
+
+```dart
+//...
+String text = '';
+try {
+  text = await FlutterMobileVision.read(
+    flash: _torchOcr,
+    autoFocus: _autoFocusOcr,
+  );
+} on Exception {
+  text = 'Failed to recognize.';
+}
+//...
+```
+
+### Android
+
+For Android, you must do the following before you can use the plugin:
+
+* Add the camera permission to your AndroidManifest.xml
+
+    `<uses-feature android:name="android.hardware.camera" />`
+
+    `<uses-permission android:name="android.permission.CAMERA" />`
+
+* Add the OCR activity to your AndroidManifest.xml
+
+   `<activity android:name="io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity" />`
+
+### iOS
+
 If you can help, the community thanks. Your fork is needed. :wink:

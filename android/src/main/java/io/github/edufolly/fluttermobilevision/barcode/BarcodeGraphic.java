@@ -72,6 +72,28 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
         return mBarcode;
     }
 
+
+    /**
+     * Checks whether a point is within the bounding box of this graphic.
+     * The provided point should be relative to this graphic's containing overlay.
+     *
+     * @param x An x parameter in the relative context of the canvas.
+     * @param y A y parameter in the relative context of the canvas.
+     * @return True if the provided point is contained within this graphic's bounding box.
+     */
+    public boolean contains(float x, float y) {
+        Barcode barcode = mBarcode;
+        if (barcode == null) {
+            return false;
+        }
+        RectF rect = new RectF(barcode.getBoundingBox());
+        rect.left = translateX(rect.left);
+        rect.top = translateY(rect.top);
+        rect.right = translateX(rect.right);
+        rect.bottom = translateY(rect.bottom);
+        return (rect.left < x && rect.right > x && rect.top < y && rect.bottom > y);
+    }
+
     /**
      * Updates the barcode instance from the detection of the most recent frame.  Invalidates the
      * relevant portions of the overlay to trigger a redraw.

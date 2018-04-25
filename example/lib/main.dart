@@ -11,13 +11,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  int _onlyFormat = Barcode.ALL_FORMATS;
-  bool _autoFocus = true;
-  bool _torch = false;
-  bool _multiple = false;
-  bool _waitTap = false;
-
+  int _onlyFormatBarcode = Barcode.ALL_FORMATS;
+  bool _autoFocusBarcode = true;
+  bool _torchBarcode = false;
+  bool _multipleBarcode = false;
+  bool _waitTapBarcode = false;
   List<Barcode> _barcodes = [];
+
+  bool _autoFocusOcr = true;
+  bool _torchOcr = false;
+  String _textOcr = '';
 
   @override
   void initState() {
@@ -31,20 +34,31 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.lime,
         buttonColor: Colors.lime,
       ),
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Flutter Mobile Vision'),
-        ),
-        body: new ListView(
-          padding: const EdgeInsets.only(
-            top: 12.0,
+      home: new DefaultTabController(
+        length: 2,
+        child: new Scaffold(
+          appBar: new AppBar(
+            bottom: new TabBar(
+              indicatorColor: Colors.black54,
+              tabs: [
+                new Tab(text: 'Barcode'),
+                new Tab(text: 'OCR'),
+              ],
+            ),
+            title: new Text('Flutter Mobile Vision'),
           ),
-          children: _getItems(context),
+          body: new TabBarView(children: [
+            _getScanScreen(context),
+            _getOcrScreen(context),
+          ]),
         ),
       ),
     );
   }
 
+  ///
+  /// Scan formats
+  ///
   List<DropdownMenuItem<int>> _getFormats() {
     List<DropdownMenuItem<int>> formatItems = [];
 
@@ -58,7 +72,10 @@ class _MyAppState extends State<MyApp> {
     return formatItems;
   }
 
-  List<Widget> _getItems(BuildContext context) {
+  ///
+  /// Scan Screen
+  ///
+  Widget _getScanScreen(BuildContext context) {
     List<Widget> items = [];
 
     items.add(new Padding(
@@ -67,7 +84,7 @@ class _MyAppState extends State<MyApp> {
         left: 18.0,
         right: 18.0,
       ),
-      child: new Text('Scan format only:'),
+      child: const Text('Scan format only:'),
     ));
 
     items.add(new Padding(
@@ -78,39 +95,39 @@ class _MyAppState extends State<MyApp> {
       child: new DropdownButton(
         items: _getFormats(),
         onChanged: (value) => setState(
-              () => _onlyFormat = value,
+              () => _onlyFormatBarcode = value,
             ),
-        value: _onlyFormat,
+        value: _onlyFormatBarcode,
       ),
     ));
 
     items.add(new SwitchListTile(
-      title: new Text('Auto focus:'),
-      value: _autoFocus,
-      onChanged: (value) => setState(() => _autoFocus = value),
+      title: const Text('Auto focus:'),
+      value: _autoFocusBarcode,
+      onChanged: (value) => setState(() => _autoFocusBarcode = value),
     ));
 
     items.add(new SwitchListTile(
-      title: new Text('Torch:'),
-      value: _torch,
-      onChanged: (value) => setState(() => _torch = value),
+      title: const Text('Torch:'),
+      value: _torchBarcode,
+      onChanged: (value) => setState(() => _torchBarcode = value),
     ));
 
     items.add(new SwitchListTile(
-      title: new Text('Multiple Scan:'),
-      value: _multiple,
+      title: const Text('Multiple Scan:'),
+      value: _multipleBarcode,
       onChanged: (value) => setState(() {
-            _multiple = value;
-            if (value) _waitTap = true;
+            _multipleBarcode = value;
+            if (value) _waitTapBarcode = true;
           }),
     ));
 
     items.add(new SwitchListTile(
-      title: new Text('Wait a tap to capture:'),
-      value: _waitTap,
+      title: const Text('Wait a tap to capture:'),
+      value: _waitTapBarcode,
       onChanged: (value) => setState(() {
-            _waitTap = value;
-            if (!value) _multiple = false;
+            _waitTapBarcode = value;
+            if (!value) _multipleBarcode = false;
           }),
     ));
 
@@ -139,18 +156,26 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
-    return items;
+    return new ListView(
+      padding: const EdgeInsets.only(
+        top: 12.0,
+      ),
+      children: items,
+    );
   }
 
+  ///
+  /// Scan Method
+  ///
   Future<Null> _scan() async {
     List<Barcode> barcodes = [];
     try {
       barcodes = await FlutterMobileVision.scan(
-        flash: _torch,
-        autoFocus: _autoFocus,
-        formats: _onlyFormat,
-        multiple: _multiple,
-        waitTap: _waitTap,
+        flash: _torchBarcode,
+        autoFocus: _autoFocusBarcode,
+        formats: _onlyFormatBarcode,
+        multiple: _multipleBarcode,
+        waitTap: _waitTapBarcode,
       );
     } on Exception {
       barcodes.add(new Barcode('Failed to get barcode.'));
@@ -159,6 +184,70 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() => _barcodes = barcodes);
+  }
+
+  ///
+  /// OCR Screen
+  ///
+  Widget _getOcrScreen(BuildContext context) {
+    List<Widget> items = [];
+
+    items.add(new SwitchListTile(
+      title: const Text('Auto focus:'),
+      value: _autoFocusOcr,
+      onChanged: (value) => setState(() => _autoFocusOcr = value),
+    ));
+
+    items.add(new SwitchListTile(
+      title: const Text('Torch:'),
+      value: _torchOcr,
+      onChanged: (value) => setState(() => _torchOcr = value),
+    ));
+
+    items.add(
+      new Padding(
+        padding: const EdgeInsets.only(
+          left: 18.0,
+          right: 18.0,
+          bottom: 12.0,
+        ),
+        child: new RaisedButton(
+          onPressed: _read,
+          child: new Text('READ!'),
+        ),
+      ),
+    );
+
+    items.add(new Text(
+      _textOcr,
+      textAlign: TextAlign.center,
+    ));
+
+    return new ListView(
+      padding: const EdgeInsets.only(
+        top: 12.0,
+      ),
+      children: items,
+    );
+  }
+
+  ///
+  /// OCR Method
+  ///
+  Future<Null> _read() async {
+    String text = '';
+    try {
+      text = await FlutterMobileVision.read(
+        flash: _torchOcr,
+        autoFocus: _autoFocusOcr,
+      );
+    } on Exception {
+      text = 'Failed to recognize.';
+    }
+
+    if (!mounted) return;
+
+    setState(() => _textOcr = text);
   }
 }
 
