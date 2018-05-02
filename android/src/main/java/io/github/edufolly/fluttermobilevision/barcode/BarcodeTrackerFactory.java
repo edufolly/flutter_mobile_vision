@@ -35,17 +35,19 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 public class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
     private GraphicOverlay<BarcodeGraphic> mGraphicOverlay;
     private Context mContext;
+    private boolean showText;
 
     public BarcodeTrackerFactory(GraphicOverlay<BarcodeGraphic> mGraphicOverlay,
-                                 Context mContext) {
+                                 Context mContext, boolean showText) {
 
         this.mGraphicOverlay = mGraphicOverlay;
         this.mContext = mContext;
+        this.showText = showText;
     }
 
     @Override
     public Tracker<Barcode> create(Barcode barcode) {
-        BarcodeGraphic graphic = new BarcodeGraphic(mGraphicOverlay);
+        BarcodeGraphic graphic = new BarcodeGraphic(mGraphicOverlay, showText);
         try {
             return new BarcodeGraphicTracker(mGraphicOverlay, graphic, mContext);
         } catch (Exception ex) {

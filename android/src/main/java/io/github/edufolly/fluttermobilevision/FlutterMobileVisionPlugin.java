@@ -43,6 +43,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private int formats = Barcode.ALL_FORMATS;
     private boolean multiple = false;
     private boolean waitTap = false;
+    private boolean showText = false;
 
     /**
      * Plugin registration.
@@ -94,6 +95,10 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 waitTap = true;
             }
 
+            if (arguments.containsKey("showText")) {
+                showText = (boolean) arguments.get("showText");
+            }
+
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
             if (rc != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new
@@ -116,6 +121,10 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 multiple = (boolean) arguments.get("multiple");
             }
 
+            if (arguments.containsKey("showText")) {
+                showText = (boolean) arguments.get("showText");
+            }
+
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
             if (rc != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new
@@ -136,6 +145,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(BarcodeCaptureActivity.FORMATS, formats);
         intent.putExtra(BarcodeCaptureActivity.MULTIPLE, multiple);
         intent.putExtra(BarcodeCaptureActivity.WAIT_TAP, waitTap);
+        intent.putExtra(BarcodeCaptureActivity.SHOW_TEXT, showText);
         activity.startActivityForResult(intent, RC_BARCODE_SCAN);
     }
 
@@ -144,6 +154,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(OcrCaptureActivity.AUTO_FOCUS, autoFocus);
         intent.putExtra(OcrCaptureActivity.USE_FLASH, useFlash);
         intent.putExtra(OcrCaptureActivity.MULTIPLE, multiple);
+        intent.putExtra(OcrCaptureActivity.SHOW_TEXT, showText);
         activity.startActivityForResult(intent, RC_OCR_READ);
     }
 

@@ -16,11 +16,13 @@ class _MyAppState extends State<MyApp> {
   bool _torchBarcode = false;
   bool _multipleBarcode = false;
   bool _waitTapBarcode = false;
+  bool _showTextBarcode = false;
   List<Barcode> _barcodes = [];
 
   bool _autoFocusOcr = true;
   bool _torchOcr = false;
   bool _multipleOcr = false;
+  bool _showTextOcr = true;
   List<OcrText> _textsOcr = [];
 
   @override
@@ -132,6 +134,12 @@ class _MyAppState extends State<MyApp> {
           }),
     ));
 
+    items.add(new SwitchListTile(
+      title: const Text('Show text:'),
+      value: _showTextBarcode,
+      onChanged: (value) => setState(() => _showTextBarcode = value),
+    ));
+
     items.add(
       new Padding(
         padding: const EdgeInsets.only(
@@ -177,6 +185,7 @@ class _MyAppState extends State<MyApp> {
         formats: _onlyFormatBarcode,
         multiple: _multipleBarcode,
         waitTap: _waitTapBarcode,
+        showText: _showTextBarcode,
       );
     } on Exception {
       barcodes.add(new Barcode('Failed to get barcode.'));
@@ -209,6 +218,12 @@ class _MyAppState extends State<MyApp> {
       title: const Text('Multiple:'),
       value: _multipleOcr,
       onChanged: (value) => setState(() => _multipleOcr = value),
+    ));
+
+    items.add(new SwitchListTile(
+      title: const Text('Show text:'),
+      value: _showTextOcr,
+      onChanged: (value) => setState(() => _showTextOcr = value),
     ));
 
     items.add(
@@ -254,9 +269,10 @@ class _MyAppState extends State<MyApp> {
         flash: _torchOcr,
         autoFocus: _autoFocusOcr,
         multiple: _multipleOcr,
+        showText: _showTextOcr,
       );
     } on Exception {
-      texts.add(new OcrText('Failed to get barcode.'));
+      texts.add(new OcrText('Failed to recognize text.'));
     }
 
     if (!mounted) return;

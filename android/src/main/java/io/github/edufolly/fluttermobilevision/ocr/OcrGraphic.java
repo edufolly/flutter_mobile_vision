@@ -34,32 +34,29 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
  */
 public class OcrGraphic extends GraphicOverlay.Graphic {
 
-    private int mId;
-
     private static final int TEXT_COLOR = Color.WHITE;
+    private static final Paint sRectPaint = new Paint();
+    private static final Paint sTextPaint = new Paint();
 
-    private static Paint sRectPaint;
-    private static Paint sTextPaint;
-    private final TextBlock mText;
+    static {
+        sRectPaint.setColor(TEXT_COLOR);
+        sRectPaint.setStyle(Paint.Style.STROKE);
+        sRectPaint.setStrokeWidth(4.0f);
 
-    OcrGraphic(GraphicOverlay overlay, TextBlock text) {
+        sTextPaint.setColor(TEXT_COLOR);
+        sTextPaint.setTextSize(50.0f);
+    }
+
+    private int mId;
+    private boolean showText;
+    private final TextBlock textBlock;
+
+    OcrGraphic(GraphicOverlay overlay, TextBlock textBlock, boolean showText) {
         super(overlay);
 
-        mText = text;
+        this.textBlock = textBlock;
+        this.showText = showText;
 
-        if (sRectPaint == null) {
-            sRectPaint = new Paint();
-            sRectPaint.setColor(TEXT_COLOR);
-            sRectPaint.setStyle(Paint.Style.STROKE);
-            sRectPaint.setStrokeWidth(4.0f);
-        }
-
-        if (sTextPaint == null) {
-            sTextPaint = new Paint();
-            sTextPaint.setColor(TEXT_COLOR);
-            sTextPaint.setTextSize(54.0f);
-        }
-        // Redraw the overlay, as this graphic has been added.
         postInvalidate();
     }
 
@@ -72,7 +69,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     }
 
     public TextBlock getTextBlock() {
-        return mText;
+        return textBlock;
     }
 
     /**
@@ -84,7 +81,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
      * @return True if the provided point is contained within this graphic's bounding box.
      */
     public boolean contains(float x, float y) {
-        TextBlock text = mText;
+        TextBlock text = textBlock;
         if (text == null) {
             return false;
         }
@@ -101,7 +98,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
      */
     @Override
     public void draw(Canvas canvas) {
-        TextBlock text = mText;
+        TextBlock text = textBlock;
         if (text == null) {
             return;
         }
@@ -119,7 +116,9 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         for (Text currentText : textComponents) {
             float left = translateX(currentText.getBoundingBox().left);
             float bottom = translateY(currentText.getBoundingBox().bottom);
-            canvas.drawText(currentText.getValue(), left, bottom, sTextPaint);
+            if (showText) {
+                canvas.drawText(currentText.getValue(), left, bottom, sTextPaint);
+            }
         }
     }
 }

@@ -55,6 +55,7 @@ public final class BarcodeCaptureActivity extends Activity
     public static final String FORMATS = "FORMATS";
     public static final String MULTIPLE = "MULTIPLE";
     public static final String WAIT_TAP = "WAIT_TAP";
+    public static final String SHOW_TEXT = "SHOW_TEXT";
 
     public static final String BARCODE_OBJECT = "Barcode";
     public static final String ERROR = "Error";
@@ -65,8 +66,11 @@ public final class BarcodeCaptureActivity extends Activity
 
     private GestureDetector gestureDetector;
 
+    private boolean autoFocus;
+    private boolean useFlash;
     private boolean multiple;
     private boolean waitTap;
+    private boolean showText;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -82,15 +86,15 @@ public final class BarcodeCaptureActivity extends Activity
             mPreview = findViewById(R.id.preview);
             mGraphicOverlay = findViewById(R.id.graphic_overlay);
 
-            boolean autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
-            boolean useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
-
+            autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
+            useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
             multiple = getIntent().getBooleanExtra(MULTIPLE, false);
             waitTap = getIntent().getBooleanExtra(WAIT_TAP, false);
+            showText = getIntent().getBooleanExtra(SHOW_TEXT, false);
 
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {
-                createCameraSource(autoFocus, useFlash);
+                createCameraSource();
             } else {
                 throw new MobileVisionException("Camera permission is needed.");
             }
@@ -107,21 +111,22 @@ public final class BarcodeCaptureActivity extends Activity
     }
 
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus, boolean useFlash) throws MobileVisionException {
+    private void createCameraSource() throws MobileVisionException {
         Context context = getApplicationContext();
 
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context)
                 .setBarcodeFormats(getIntent().getIntExtra(FORMATS, Barcode.ALL_FORMATS))
                 .build();
 
-        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverlay, this);
+        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverlay,
+                this, showText);
 
         barcodeDetector.setProcessor(
                 new MultiProcessor.Builder<>(barcodeFactory).build());
 
         if (!barcodeDetector.isOperational()) {
-            IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
-            boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+            IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
 
             if (hasLowStorage) {
                 throw new MobileVisionException("Low Storage.");

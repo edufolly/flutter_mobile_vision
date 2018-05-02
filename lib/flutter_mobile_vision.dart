@@ -15,6 +15,7 @@ class FlutterMobileVision {
     int formats: Barcode.ALL_FORMATS,
     bool multiple: false,
     bool waitTap: false,
+    bool showText: false,
   }) async {
     if (multiple) {
       waitTap = true;
@@ -25,6 +26,7 @@ class FlutterMobileVision {
       'formats': formats,
       'multiple': multiple,
       'waitTap': waitTap,
+      'showText': showText,
     };
 
     final List list = await _channel.invokeMethod('scan', arguments);
@@ -39,11 +41,13 @@ class FlutterMobileVision {
     bool flash: false,
     bool autoFocus: true,
     bool multiple: false,
+    bool showText: true,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
       'autoFocus': autoFocus,
       'multiple': multiple,
+      'showText': showText,
     };
 
     final List list = await _channel.invokeMethod('read', arguments);

@@ -50,6 +50,7 @@ public final class OcrCaptureActivity extends Activity {
     public static final String AUTO_FOCUS = "AUTO_FOCUS";
     public static final String USE_FLASH = "USE_FLASH";
     public static final String MULTIPLE = "MULTIPLE";
+    public static final String SHOW_TEXT = "SHOW_TEXT";
 
     public static final String TEXT_OBJECT = "Text";
     public static final String ERROR = "Error";
@@ -60,7 +61,10 @@ public final class OcrCaptureActivity extends Activity {
 
     private GestureDetector gestureDetector;
 
+    private boolean useFlash;
+    private boolean autoFocus;
     private boolean multiple;
+    private boolean showText;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -76,14 +80,14 @@ public final class OcrCaptureActivity extends Activity {
             mPreview = findViewById(R.id.preview);
             mGraphicOverlay = findViewById(R.id.graphic_overlay);
 
-            boolean autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
-            boolean useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
-
+            useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
+            autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             multiple = getIntent().getBooleanExtra(MULTIPLE, false);
+            showText = getIntent().getBooleanExtra(SHOW_TEXT, false);
 
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {
-                createCameraSource(autoFocus, useFlash);
+                createCameraSource();
             } else {
                 throw new MobileVisionException("Camera permission is needed.");
             }
@@ -101,11 +105,11 @@ public final class OcrCaptureActivity extends Activity {
     }
 
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus, boolean useFlash) throws MobileVisionException {
+    private void createCameraSource() throws MobileVisionException {
         Context context = getApplicationContext();
 
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-        textRecognizer.setProcessor(new OcrDetectorProcessor(mGraphicOverlay));
+        textRecognizer.setProcessor(new OcrDetectorProcessor(mGraphicOverlay, showText));
 
         if (!textRecognizer.isOperational()) {
             IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);

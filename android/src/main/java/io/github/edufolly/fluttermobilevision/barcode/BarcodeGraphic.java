@@ -37,15 +37,16 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
     private static int mCurrentColorIndex;
     private int mId;
     private Paint mRectPaint;
-    //    private Paint mTextPaint;
+    private Paint mTextPaint;
     private volatile Barcode mBarcode;
 
     static {
         mCurrentColorIndex = 0;
     }
 
-    BarcodeGraphic(GraphicOverlay overlay) {
+    BarcodeGraphic(GraphicOverlay overlay, boolean showText) {
         super(overlay);
+
 
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
@@ -55,9 +56,11 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
         mRectPaint.setStyle(Paint.Style.STROKE);
         mRectPaint.setStrokeWidth(4.0f);
 
-//        mTextPaint = new Paint();
-//        mTextPaint.setColor(selectedColor);
-//        mTextPaint.setTextSize(36.0f);
+        if (showText) {
+            mTextPaint = new Paint();
+            mTextPaint.setColor(selectedColor);
+            mTextPaint.setTextSize(36.0f);
+        }
     }
 
     public int getId() {
@@ -98,7 +101,7 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
      * Updates the barcode instance from the detection of the most recent frame.  Invalidates the
      * relevant portions of the overlay to trigger a redraw.
      */
-    void updateItem(Barcode barcode) {
+    public void updateItem(Barcode barcode) {
         mBarcode = barcode;
         postInvalidate();
     }
@@ -121,7 +124,9 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
         rect.bottom = translateY(rect.bottom);
         canvas.drawRect(rect, mRectPaint);
 
-//        // Draws a label at the bottom of the barcode indicate the barcode value that was detected.
-//        canvas.drawText(barcode.rawValue, rect.left, rect.bottom, mTextPaint);
+        if (mTextPaint != null) {
+            // Draws a label at the bottom of the barcode indicate the barcode value that was detected.
+            canvas.drawText(barcode.rawValue, rect.left, rect.bottom, mTextPaint);
+        }
     }
 }

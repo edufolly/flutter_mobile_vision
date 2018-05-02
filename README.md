@@ -13,7 +13,7 @@ Liked? :star: Star the repo to support the project!
 ## Features
 
 * [ ] Android
-   * [ ] Barcode Scan
+   * [x] Barcode Scan
       * [x] Simple scan.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -22,11 +22,13 @@ Liked? :star: Star the repo to support the project!
       * [x] Select barcode type to be scanned.
       * [x] Scan multiple barcodes.
       * [x] Barcode coordinates.
-   * [ ] Recognize Text
+      * [x] Show barcode text.
+   * [x] Recognize Text
       * [x] Simple OCR.
       * [x] Multiple recognition.
       * [x] Text language.
       * [x] Text coordinates.
+      * [x] Hide recognized text.
    * [ ] Detect Faces
       * [ ] _Future Tasks_
 
@@ -53,7 +55,7 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision: ^0.0.2
+    flutter_mobile_vision: ^0.0.3
 ```
 
 -----
@@ -65,11 +67,12 @@ To use this plugin :
 List<Barcode> barcodes = [];
 try {
   barcodes = await FlutterMobileVision.scan(
-    flash: _torch,
-    autoFocus: _autoFocus,
-    formats: _onlyFormat,
-    multiple: _multiple,
-    waitTap: _waitTap,
+    flash: _torchBarcode,
+    autoFocus: _autoFocusBarcode,
+    formats: _onlyFormatBarcode,
+    multiple: _multipleBarcode,
+    waitTap: _waitTapBarcode,
+    showText: _showTextBarcode,
   );
 } on Exception {
   barcodes.add(new Barcode('Failed to get barcode.'));
@@ -107,9 +110,10 @@ try {
     flash: _torchOcr,
     autoFocus: _autoFocusOcr,
     multiple: _multipleOcr,
+    showText: _showTextOcr,
   );
 } on Exception {
-  texts.add(new OcrText('Failed to get barcode.'));
+  texts.add(new OcrText('Failed to recognize text.'));
 }
 //...
 ```

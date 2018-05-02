@@ -28,10 +28,12 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
  */
 public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
 
-    private GraphicOverlay<OcrGraphic> mGraphicOverlay;
+    private GraphicOverlay<OcrGraphic> graphicOverlay;
+    private boolean showText;
 
-    OcrDetectorProcessor(GraphicOverlay<OcrGraphic> ocrGraphicOverlay) {
-        mGraphicOverlay = ocrGraphicOverlay;
+    OcrDetectorProcessor(GraphicOverlay<OcrGraphic> graphicOverlay, boolean showText) {
+        this.graphicOverlay = graphicOverlay;
+        this.showText = showText;
     }
 
     /**
@@ -43,12 +45,12 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
      */
     @Override
     public void receiveDetections(Detector.Detections<TextBlock> detections) {
-        mGraphicOverlay.clear();
+        graphicOverlay.clear();
         SparseArray<TextBlock> items = detections.getDetectedItems();
         for (int i = 0; i < items.size(); ++i) {
             TextBlock item = items.valueAt(i);
-            OcrGraphic graphic = new OcrGraphic(mGraphicOverlay, item);
-            mGraphicOverlay.add(graphic);
+            OcrGraphic graphic = new OcrGraphic(graphicOverlay, item, showText);
+            graphicOverlay.add(graphic);
         }
     }
 
@@ -57,6 +59,6 @@ public class OcrDetectorProcessor implements Detector.Processor<TextBlock> {
      */
     @Override
     public void release() {
-        mGraphicOverlay.clear();
+        graphicOverlay.clear();
     }
 }
