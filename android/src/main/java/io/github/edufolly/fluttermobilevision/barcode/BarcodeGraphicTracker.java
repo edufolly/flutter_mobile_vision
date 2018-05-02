@@ -23,6 +23,7 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
 
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 /**
  * Generic tracker which is used for tracking or reading a barcode (and can really be used for
@@ -46,13 +47,13 @@ public class BarcodeGraphicTracker extends Tracker<Barcode> {
     }
 
     BarcodeGraphicTracker(GraphicOverlay<BarcodeGraphic> mOverlay, BarcodeGraphic mGraphic,
-                          Context context) {
+                          Context context) throws MobileVisionException {
         this.mOverlay = mOverlay;
         this.mGraphic = mGraphic;
         if (context instanceof BarcodeUpdateListener) {
             this.mBarcodeUpdateListener = (BarcodeUpdateListener) context;
         } else {
-            throw new RuntimeException("Hosting activity must implement BarcodeUpdateListener");
+            throw new MobileVisionException("Hosting activity must implement BarcodeUpdateListener");
         }
     }
 

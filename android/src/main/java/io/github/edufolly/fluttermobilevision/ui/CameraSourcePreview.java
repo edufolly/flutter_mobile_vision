@@ -30,6 +30,8 @@ import com.google.android.gms.common.images.Size;
 
 import java.io.IOException;
 
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
+
 public class CameraSourcePreview extends ViewGroup {
 
     private static final String TAG = "CameraSourcePreview";
@@ -54,7 +56,9 @@ public class CameraSourcePreview extends ViewGroup {
     }
 
     @RequiresPermission(Manifest.permission.CAMERA)
-    public void start(CameraSource cameraSource) throws IOException, SecurityException {
+    public void start(CameraSource cameraSource)
+            throws IOException, SecurityException, MobileVisionException {
+
         if (cameraSource == null) {
             stop();
         }
@@ -68,7 +72,9 @@ public class CameraSourcePreview extends ViewGroup {
     }
 
     @RequiresPermission(Manifest.permission.CAMERA)
-    public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException, SecurityException {
+    public void start(CameraSource cameraSource, GraphicOverlay overlay)
+            throws IOException, SecurityException, MobileVisionException {
+
         mOverlay = overlay;
         start(cameraSource);
     }
@@ -87,7 +93,7 @@ public class CameraSourcePreview extends ViewGroup {
     }
 
     @RequiresPermission(Manifest.permission.CAMERA)
-    private void startIfReady() throws IOException, SecurityException {
+    private void startIfReady() throws IOException, SecurityException, MobileVisionException {
         if (mStartRequested && mSurfaceAvailable) {
             mCameraSource.start(mSurfaceView.getHolder());
             if (mOverlay != null) {
@@ -114,6 +120,8 @@ public class CameraSourcePreview extends ViewGroup {
             mSurfaceAvailable = true;
             try {
                 startIfReady();
+            } catch (MobileVisionException zse) {
+                Log.e(TAG, "Mobile Vision Exception", zse);
             } catch (SecurityException se) {
                 Log.e(TAG, "Do not have permission to start the camera", se);
             } catch (IOException e) {
@@ -186,13 +194,14 @@ public class CameraSourcePreview extends ViewGroup {
 
         try {
             startIfReady();
+        } catch (MobileVisionException zse) {
+            Log.e(TAG, "Mobile Vision Exception", zse);
         } catch (SecurityException se) {
             Log.e(TAG, "Do not have permission to start the camera", se);
         } catch (IOException e) {
             Log.e(TAG, "Could not start camera source.", e);
         }
     }
-
 
     private boolean isPortraitMode() {
         int orientation = mContext.getResources().getConfiguration().orientation;
@@ -206,5 +215,4 @@ public class CameraSourcePreview extends ViewGroup {
         Log.d(TAG, "isPortraitMode returning false by default");
         return false;
     }
-
 }

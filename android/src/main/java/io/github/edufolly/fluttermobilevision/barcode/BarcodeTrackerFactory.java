@@ -16,6 +16,7 @@
 package io.github.edufolly.fluttermobilevision.barcode;
 
 import android.content.Context;
+import android.util.Log;
 
 
 import com.google.android.gms.vision.MultiProcessor;
@@ -45,7 +46,12 @@ public class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
     @Override
     public Tracker<Barcode> create(Barcode barcode) {
         BarcodeGraphic graphic = new BarcodeGraphic(mGraphicOverlay);
-        return new BarcodeGraphicTracker(mGraphicOverlay, graphic, mContext);
+        try {
+            return new BarcodeGraphicTracker(mGraphicOverlay, graphic, mContext);
+        } catch (Exception ex) {
+            Log.d("BarcodeTrackerFactory", ex.getMessage(), ex);
+        }
+        return null;
     }
 
 }

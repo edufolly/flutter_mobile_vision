@@ -45,7 +45,7 @@ import io.github.edufolly.fluttermobilevision.R;
 import io.github.edufolly.fluttermobilevision.ui.CameraSource;
 import io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview;
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
-import io.github.edufolly.fluttermobilevision.util.BarcodeException;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 public final class BarcodeCaptureActivity extends Activity
         implements BarcodeGraphicTracker.BarcodeUpdateListener {
@@ -85,14 +85,14 @@ public final class BarcodeCaptureActivity extends Activity
             boolean autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             boolean useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
 
-            waitTap = getIntent().getBooleanExtra(WAIT_TAP, false);
             multiple = getIntent().getBooleanExtra(MULTIPLE, false);
+            waitTap = getIntent().getBooleanExtra(WAIT_TAP, false);
 
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {
                 createCameraSource(autoFocus, useFlash);
             } else {
-                throw new BarcodeException("Camera permission is needed.");
+                throw new MobileVisionException("Camera permission is needed.");
             }
 
             gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
@@ -107,7 +107,7 @@ public final class BarcodeCaptureActivity extends Activity
     }
 
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus, boolean useFlash) throws BarcodeException {
+    private void createCameraSource(boolean autoFocus, boolean useFlash) throws MobileVisionException {
         Context context = getApplicationContext();
 
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context)
@@ -124,7 +124,7 @@ public final class BarcodeCaptureActivity extends Activity
             boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
             if (hasLowStorage) {
-                throw new BarcodeException("Low Storage.");
+                throw new MobileVisionException("Low Storage.");
             }
         }
 
@@ -175,13 +175,13 @@ public final class BarcodeCaptureActivity extends Activity
     }
 
     @SuppressLint("MissingPermission")
-    private void startCameraSource() throws SecurityException, BarcodeException {
+    private void startCameraSource() throws SecurityException, MobileVisionException {
 
         int code = GoogleApiAvailability.getInstance()
                 .isGooglePlayServicesAvailable(getApplicationContext());
 
         if (code != ConnectionResult.SUCCESS) {
-            throw new BarcodeException("Google Api Availability Error: " + code);
+            throw new MobileVisionException("Google Api Availability Error: " + code);
         }
 
         if (mCameraSource != null) {
@@ -190,7 +190,7 @@ public final class BarcodeCaptureActivity extends Activity
             } catch (IOException e) {
                 mCameraSource.release();
                 mCameraSource = null;
-                throw new BarcodeException("Unable to start camera source.", e);
+                throw new MobileVisionException("Unable to start camera source.", e);
             }
         }
     }

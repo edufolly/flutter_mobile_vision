@@ -18,27 +18,18 @@ package io.github.edufolly.fluttermobilevision.ocr;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -47,16 +38,18 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import io.github.edufolly.fluttermobilevision.R;
 import io.github.edufolly.fluttermobilevision.ui.CameraSource;
 import io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview;
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
-import io.github.edufolly.fluttermobilevision.util.BarcodeException;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 public final class OcrCaptureActivity extends Activity {
     public static final String AUTO_FOCUS = "AUTO_FOCUS";
     public static final String USE_FLASH = "USE_FLASH";
+    public static final String MULTIPLE = "MULTIPLE";
 
     public static final String TEXT_OBJECT = "Text";
     public static final String ERROR = "Error";
@@ -65,8 +58,9 @@ public final class OcrCaptureActivity extends Activity {
     private CameraSourcePreview mPreview;
     private GraphicOverlay<OcrGraphic> mGraphicOverlay;
 
-    private ScaleGestureDetector scaleGestureDetector;
     private GestureDetector gestureDetector;
+
+    private boolean multiple;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -85,11 +79,13 @@ public final class OcrCaptureActivity extends Activity {
             boolean autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             boolean useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
 
+            multiple = getIntent().getBooleanExtra(MULTIPLE, false);
+
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {
                 createCameraSource(autoFocus, useFlash);
             } else {
-                throw new BarcodeException("Camera permission is needed.");
+                throw new MobileVisionException("Camera permission is needed.");
             }
 
             gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
@@ -99,30 +95,13 @@ public final class OcrCaptureActivity extends Activity {
                 }
             });
 
-            scaleGestureDetector = new ScaleGestureDetector(this,
-                    new ScaleGestureDetector.OnScaleGestureListener() {
-                        @Override
-                        public boolean onScale(ScaleGestureDetector detector) {
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onScaleBegin(ScaleGestureDetector detector) {
-                            return true;
-                        }
-
-                        @Override
-                        public void onScaleEnd(ScaleGestureDetector detector) {
-                            mCameraSource.doZoom(detector.getScaleFactor());
-                        }
-                    });
         } catch (Exception e) {
             onError(e);
         }
     }
 
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus, boolean useFlash) throws BarcodeException {
+    private void createCameraSource(boolean autoFocus, boolean useFlash) throws MobileVisionException {
         Context context = getApplicationContext();
 
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
@@ -133,21 +112,21 @@ public final class OcrCaptureActivity extends Activity {
             boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
             if (hasLowStorage) {
-                throw new BarcodeException("Low Storage.");
+                throw new MobileVisionException("Low Storage.");
             }
         }
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        mCameraSource =
-                new CameraSource.Builder(getApplicationContext(), textRecognizer)
-                        .setFacing(CameraSource.CAMERA_FACING_BACK)
-                        .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
-                        .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
-                        .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
-                        .setRequestedFps(2.0f)
-                        .build();
+        mCameraSource = new CameraSource
+                .Builder(getApplicationContext(), textRecognizer)
+                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+                .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
+                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
+                .setRequestedFps(2.0f)
+                .build();
     }
 
     private void onError(Exception e) {
@@ -184,13 +163,13 @@ public final class OcrCaptureActivity extends Activity {
     }
 
     @SuppressLint("MissingPermission")
-    private void startCameraSource() throws SecurityException, BarcodeException {
+    private void startCameraSource() throws SecurityException, MobileVisionException {
 
         int code = GoogleApiAvailability.getInstance()
                 .isGooglePlayServicesAvailable(getApplicationContext());
 
         if (code != ConnectionResult.SUCCESS) {
-            throw new BarcodeException("Google Api Availability Error: " + code);
+            throw new MobileVisionException("Google Api Availability Error: " + code);
         }
 
         if (mCameraSource != null) {
@@ -199,37 +178,62 @@ public final class OcrCaptureActivity extends Activity {
             } catch (IOException e) {
                 mCameraSource.release();
                 mCameraSource = null;
-                throw new BarcodeException("Unable to start camera source.", e);
+                throw new MobileVisionException("Unable to start camera source.", e);
             }
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
-        return scaleGestureDetector.onTouchEvent(e)
-                || gestureDetector.onTouchEvent(e)
+        return gestureDetector.onTouchEvent(e)
                 || super.onTouchEvent(e);
     }
 
+
     private boolean onTap(float rawX, float rawY) {
-        // FIXME : Problem here!
-        OcrGraphic graphic = mGraphicOverlay.getGraphicAtLocation(rawX, rawY);
-        TextBlock text;
-        if (graphic != null) {
-            text = graphic.getTextBlock();
-            if (text != null && text.getValue() != null) {
-                Intent data = new Intent();
-                data.putExtra(TEXT_OBJECT, text.getValue());
-                setResult(CommonStatusCodes.SUCCESS, data);
-                finish();
-                return true;
-            } else {
-                Log.d("OCR", "text data is null");
-                return false;
+        ArrayList<MyTextBlock> list = new ArrayList<>();
+
+        if (multiple) {
+            for (OcrGraphic graphic : mGraphicOverlay.getGraphics()) {
+                list.add(new MyTextBlock(graphic.getTextBlock()));
             }
         } else {
-            Log.d("OCR", "no text detected");
-            return false;
+            int[] location = new int[2];
+            mGraphicOverlay.getLocationOnScreen(location);
+            float x = (rawX - location[0]) / mGraphicOverlay.getWidthScaleFactor();
+            float y = (rawY - location[1]) / mGraphicOverlay.getHeightScaleFactor();
+
+            TextBlock best = null;
+            float bestDistance = Float.MAX_VALUE;
+
+            for (OcrGraphic graphic : mGraphicOverlay.getGraphics()) {
+                TextBlock textBlock = graphic.getTextBlock();
+                if (textBlock.getBoundingBox().contains((int) x, (int) y)) {
+                    best = textBlock;
+                    break;
+                }
+                float dx = x - textBlock.getBoundingBox().centerX();
+                float dy = y - textBlock.getBoundingBox().centerY();
+                float distance = (dx * dx) + (dy * dy);
+                if (distance < bestDistance) {
+                    best = textBlock;
+                    bestDistance = distance;
+                }
+            }
+
+            if (best != null) {
+                list.add(new MyTextBlock(best));
+            }
         }
+
+        if (!list.isEmpty()) {
+            Intent data = new Intent();
+            data.putExtra(TEXT_OBJECT, list);
+            setResult(CommonStatusCodes.SUCCESS, data);
+            finish();
+            return true;
+        }
+
+        return false;
     }
 }

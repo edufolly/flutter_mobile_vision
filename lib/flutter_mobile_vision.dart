@@ -6,6 +6,9 @@ class FlutterMobileVision {
   static const MethodChannel _channel =
       const MethodChannel('flutter_mobile_vision');
 
+  ///
+  ///
+  ///
   static Future<List<Barcode>> scan({
     bool flash: false,
     bool autoFocus: true,
@@ -29,21 +32,29 @@ class FlutterMobileVision {
     return list.map((map) => Barcode.fromMap(map)).toList();
   }
 
-  static Future<String> read({
+  ///
+  ///
+  ///
+  static Future<List<OcrText>> read({
     bool flash: false,
     bool autoFocus: true,
+    bool multiple: false,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
       'autoFocus': autoFocus,
+      'multiple': multiple,
     };
 
-    final text = await _channel.invokeMethod('read', arguments);
+    final List list = await _channel.invokeMethod('read', arguments);
 
-    return text.toString();
+    return list.map((map) => OcrText.fromMap(map)).toList();
   }
 }
 
+///
+///
+///
 class Barcode {
   static const int ALL_FORMATS = 0;
   static const int CODE_128 = 1;
@@ -117,12 +128,12 @@ class Barcode {
   Barcode(
     this.displayValue, {
     this.rawValue: '',
-    this.format: Barcode.ALL_FORMATS,
-    this.valueFormat: Barcode.TEXT,
-    this.top: 0,
-    this.bottom: 0,
-    this.left: 0,
-    this.right: 0,
+    this.format: 99,
+    this.valueFormat: 99,
+    this.top: -1,
+    this.bottom: -1,
+    this.left: -1,
+    this.right: -1,
   });
 
   Barcode.fromMap(Map map)
@@ -141,6 +152,10 @@ class Barcode {
       'rawValue': rawValue,
       'format': format,
       'valueFormat': valueFormat,
+      'top': top,
+      'bottom': bottom,
+      'left': left,
+      'right': right,
     };
   }
 
@@ -150,5 +165,45 @@ class Barcode {
 
   String getValueFormatString() {
     return mapValueFormat[valueFormat] ?? 'UNKNOWN';
+  }
+}
+
+///
+///
+///
+class OcrText {
+  final String value;
+  final String language;
+  final int top;
+  final int bottom;
+  final int left;
+  final int right;
+
+  OcrText(
+    this.value, {
+    this.language: '',
+    this.top: -1,
+    this.bottom: -1,
+    this.left: -1,
+    this.right: -1,
+  });
+
+  OcrText.fromMap(Map map)
+      : value = map['value'],
+        language = map['language'],
+        top = map['top'],
+        bottom = map['bottom'],
+        left = map['left'],
+        right = map['right'];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'value': value,
+      'language': language,
+      'top': top,
+      'bottom': bottom,
+      'left': left,
+      'right': right,
+    };
   }
 }

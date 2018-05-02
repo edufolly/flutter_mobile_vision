@@ -23,10 +23,10 @@ Liked? :star: Star the repo to support the project!
       * [x] Scan multiple barcodes.
       * [x] Barcode coordinates.
    * [ ] Recognize Text
-      * [ ] Simple OCR *Working in Progress*.
-      * [ ] Multiple recognition.
-      * [ ] Text language.
-      * [ ] Text coordinates.
+      * [x] Simple OCR.
+      * [x] Multiple recognition.
+      * [x] Text language.
+      * [x] Text coordinates.
    * [ ] Detect Faces
       * [ ] _Future Tasks_
 
@@ -101,14 +101,15 @@ If you can help, the community thanks. Your fork is needed. :wink:
 
 ```dart
 //...
-String text = '';
+List<OcrText> texts = [];
 try {
-  text = await FlutterMobileVision.read(
+  texts = await FlutterMobileVision.read(
     flash: _torchOcr,
     autoFocus: _autoFocusOcr,
+    multiple: _multipleOcr,
   );
 } on Exception {
-  text = 'Failed to recognize.';
+  texts.add(new OcrText('Failed to get barcode.'));
 }
 //...
 ```

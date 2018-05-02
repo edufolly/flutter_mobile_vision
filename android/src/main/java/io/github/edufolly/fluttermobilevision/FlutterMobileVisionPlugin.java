@@ -22,6 +22,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity;
+import io.github.edufolly.fluttermobilevision.ocr.MyTextBlock;
 import io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity;
 
 /**
@@ -111,6 +112,10 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 autoFocus = (boolean) arguments.get("autoFocus");
             }
 
+            if (arguments.containsKey("multiple")) {
+                multiple = (boolean) arguments.get("multiple");
+            }
+
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
             if (rc != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new
@@ -136,8 +141,9 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
     private void ocrRead() {
         Intent intent = new Intent(activity, OcrCaptureActivity.class);
-        intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, autoFocus);
-        intent.putExtra(BarcodeCaptureActivity.USE_FLASH, useFlash);
+        intent.putExtra(OcrCaptureActivity.AUTO_FOCUS, autoFocus);
+        intent.putExtra(OcrCaptureActivity.USE_FLASH, useFlash);
+        intent.putExtra(OcrCaptureActivity.MULTIPLE, multiple);
         activity.startActivityForResult(intent, RC_OCR_READ);
     }
 
@@ -175,12 +181,16 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         } else if (requestCode == RC_OCR_READ) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (intent != null) {
-                    String text = intent.getStringExtra(OcrCaptureActivity.TEXT_OBJECT);
-
-                    // TODO: Other properties.
-
-                    result.success(text);
-                    return true;
+                    ArrayList<MyTextBlock> blocks = intent
+                            .getParcelableArrayListExtra(OcrCaptureActivity.TEXT_OBJECT);
+                    if (!blocks.isEmpty()) {
+                        List<Map<String, Object>> list = new ArrayList<>();
+                        for (MyTextBlock block : blocks) {
+                            list.add(block.getMap());
+                        }
+                        result.success(list);
+                        return true;
+                    }
                 }
                 result.error("No text recognized, intent data is null", null, null);
             } else if (resultCode == CommonStatusCodes.ERROR) {

@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
+
 // Note: This requires Google Play Services 8.1 or higher, due to using indirect byte buffers for
 // storing images.
 
@@ -336,7 +338,7 @@ public class CameraSource {
      */
     @SuppressLint("MissingPermission")
     @RequiresPermission(Manifest.permission.CAMERA)
-    public CameraSource start() throws IOException {
+    public CameraSource start() throws IOException, MobileVisionException {
         synchronized (mCameraLock) {
             if (mCamera != null) {
                 return this;
@@ -371,7 +373,9 @@ public class CameraSource {
      */
     @SuppressLint("MissingPermission")
     @RequiresPermission(Manifest.permission.CAMERA)
-    public CameraSource start(SurfaceHolder surfaceHolder) throws IOException {
+    public CameraSource start(SurfaceHolder surfaceHolder)
+            throws IOException, MobileVisionException {
+
         synchronized (mCameraLock) {
             if (mCamera != null) {
                 return this;
@@ -743,23 +747,23 @@ public class CameraSource {
      * @throws RuntimeException if the method fails
      */
     @SuppressLint("InlinedApi")
-    private Camera createCamera() {
+    private Camera createCamera() throws MobileVisionException {
         int requestedCameraId = getIdForRequestedCamera(mFacing);
         if (requestedCameraId == -1) {
-            throw new RuntimeException("Could not find requested camera.");
+            throw new MobileVisionException("Could not find requested camera.");
         }
         Camera camera = Camera.open(requestedCameraId);
 
         SizePair sizePair = selectSizePair(camera, mRequestedPreviewWidth, mRequestedPreviewHeight);
         if (sizePair == null) {
-            throw new RuntimeException("Could not find suitable preview size.");
+            throw new MobileVisionException("Could not find suitable preview size.");
         }
         Size pictureSize = sizePair.pictureSize();
         mPreviewSize = sizePair.previewSize();
 
         int[] previewFpsRange = selectPreviewFpsRange(camera, mRequestedFps);
         if (previewFpsRange == null) {
-            throw new RuntimeException("Could not find suitable preview frames per second range.");
+            throw new MobileVisionException("Could not find suitable preview frames per second range.");
         }
 
         Camera.Parameters parameters = camera.getParameters();

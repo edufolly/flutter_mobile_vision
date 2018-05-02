@@ -20,7 +20,8 @@ class _MyAppState extends State<MyApp> {
 
   bool _autoFocusOcr = true;
   bool _torchOcr = false;
-  String _textOcr = '';
+  bool _multipleOcr = false;
+  List<OcrText> _textsOcr = [];
 
   @override
   void initState() {
@@ -204,6 +205,12 @@ class _MyAppState extends State<MyApp> {
       onChanged: (value) => setState(() => _torchOcr = value),
     ));
 
+    items.add(new SwitchListTile(
+      title: const Text('Multiple:'),
+      value: _multipleOcr,
+      onChanged: (value) => setState(() => _multipleOcr = value),
+    ));
+
     items.add(
       new Padding(
         padding: const EdgeInsets.only(
@@ -218,10 +225,16 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
-    items.add(new Text(
-      _textOcr,
-      textAlign: TextAlign.center,
-    ));
+    items.addAll(
+      ListTile.divideTiles(
+        context: context,
+        tiles: _textsOcr
+            .map(
+              (ocrText) => new OcrTextWidget(ocrText),
+            )
+            .toList(),
+      ),
+    );
 
     return new ListView(
       padding: const EdgeInsets.only(
@@ -235,22 +248,26 @@ class _MyAppState extends State<MyApp> {
   /// OCR Method
   ///
   Future<Null> _read() async {
-    String text = '';
+    List<OcrText> texts = [];
     try {
-      text = await FlutterMobileVision.read(
+      texts = await FlutterMobileVision.read(
         flash: _torchOcr,
         autoFocus: _autoFocusOcr,
+        multiple: _multipleOcr,
       );
     } on Exception {
-      text = 'Failed to recognize.';
+      texts.add(new OcrText('Failed to get barcode.'));
     }
 
     if (!mounted) return;
 
-    setState(() => _textOcr = text);
+    setState(() => _textsOcr = texts);
   }
 }
 
+///
+/// BarcodeWidget
+///
 class BarcodeWidget extends StatelessWidget {
   final Barcode barcode;
 
@@ -275,6 +292,33 @@ class BarcodeWidget extends StatelessWidget {
   }
 }
 
+///
+/// OcrTextWidget
+///
+class OcrTextWidget extends StatelessWidget {
+  final OcrText ocrText;
+
+  OcrTextWidget(this.ocrText);
+
+  @override
+  Widget build(BuildContext context) {
+    return new ListTile(
+      leading: const Icon(Icons.title),
+      title: new Text(ocrText.value),
+      subtitle: new Text(ocrText.language),
+      trailing: const Icon(Icons.arrow_forward),
+      onTap: () => Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (context) => new OcrTextDetails(ocrText),
+            ),
+          ),
+    );
+  }
+}
+
+///
+/// BarcodeDetails
+///
 class BarcodeDetails extends StatefulWidget {
   final Barcode barcode;
 
@@ -325,6 +369,57 @@ class _BarcodeDetailsState extends State<BarcodeDetails> {
           ),
           new ListTile(
             title: new Text(widget.barcode.right.toString()),
+            subtitle: const Text('Right'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+///
+/// OcrTextDetail
+///
+class OcrTextDetails extends StatefulWidget {
+  final OcrText ocrText;
+
+  OcrTextDetails(this.ocrText);
+
+  @override
+  _OcrTextDetailsState createState() => new _OcrTextDetailsState();
+}
+
+class _OcrTextDetailsState extends State<OcrTextDetails> {
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('Barcode Details'),
+      ),
+      body: new ListView(
+        children: <Widget>[
+          new ListTile(
+            title: new Text(widget.ocrText.value),
+            subtitle: const Text('Value'),
+          ),
+          new ListTile(
+            title: new Text(widget.ocrText.language),
+            subtitle: const Text('Language'),
+          ),
+          new ListTile(
+            title: new Text(widget.ocrText.top.toString()),
+            subtitle: const Text('Top'),
+          ),
+          new ListTile(
+            title: new Text(widget.ocrText.bottom.toString()),
+            subtitle: const Text('Bottom'),
+          ),
+          new ListTile(
+            title: new Text(widget.ocrText.left.toString()),
+            subtitle: const Text('Left'),
+          ),
+          new ListTile(
+            title: new Text(widget.ocrText.right.toString()),
             subtitle: const Text('Right'),
           ),
         ],
