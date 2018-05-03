@@ -33,26 +33,25 @@ import java.io.IOException;
 import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 public class CameraSourcePreview extends ViewGroup {
-
     private static final String TAG = "CameraSourcePreview";
 
-    private Context mContext;
-    private SurfaceView mSurfaceView;
-    private boolean mStartRequested;
-    private boolean mSurfaceAvailable;
-    private CameraSource mCameraSource;
+    private Context context;
+    private SurfaceView surfaceView;
+    private boolean startRequested;
+    private boolean surfaceAvailable;
+    private CameraSource cameraSource;
 
-    private GraphicOverlay mOverlay;
+    private GraphicOverlay overlay;
 
     public CameraSourcePreview(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mContext = context;
-        mStartRequested = false;
-        mSurfaceAvailable = false;
+        this.context = context;
+        startRequested = false;
+        surfaceAvailable = false;
 
-        mSurfaceView = new SurfaceView(context);
-        mSurfaceView.getHolder().addCallback(new SurfaceCallback());
-        addView(mSurfaceView);
+        surfaceView = new SurfaceView(context);
+        surfaceView.getHolder().addCallback(new SurfaceCallback());
+        addView(surfaceView);
     }
 
     @RequiresPermission(Manifest.permission.CAMERA)
@@ -63,10 +62,10 @@ public class CameraSourcePreview extends ViewGroup {
             stop();
         }
 
-        mCameraSource = cameraSource;
+        this.cameraSource = cameraSource;
 
-        if (mCameraSource != null) {
-            mStartRequested = true;
+        if (this.cameraSource != null) {
+            startRequested = true;
             startIfReady();
         }
     }
@@ -75,41 +74,41 @@ public class CameraSourcePreview extends ViewGroup {
     public void start(CameraSource cameraSource, GraphicOverlay overlay)
             throws IOException, SecurityException, MobileVisionException {
 
-        mOverlay = overlay;
+        this.overlay = overlay;
         start(cameraSource);
     }
 
     public void stop() {
-        if (mCameraSource != null) {
-            mCameraSource.stop();
+        if (cameraSource != null) {
+            cameraSource.stop();
         }
     }
 
     public void release() {
-        if (mCameraSource != null) {
-            mCameraSource.release();
-            mCameraSource = null;
+        if (cameraSource != null) {
+            cameraSource.release();
+            cameraSource = null;
         }
     }
 
     @RequiresPermission(Manifest.permission.CAMERA)
     private void startIfReady() throws IOException, SecurityException, MobileVisionException {
-        if (mStartRequested && mSurfaceAvailable) {
-            mCameraSource.start(mSurfaceView.getHolder());
-            if (mOverlay != null) {
-                Size size = mCameraSource.getPreviewSize();
+        if (startRequested && surfaceAvailable) {
+            cameraSource.start(surfaceView.getHolder());
+            if (overlay != null) {
+                Size size = cameraSource.getPreviewSize();
                 int min = Math.min(size.getWidth(), size.getHeight());
                 int max = Math.max(size.getWidth(), size.getHeight());
                 if (isPortraitMode()) {
                     // Swap width and height sizes when in portrait, since it will be rotated by
                     // 90 degrees
-                    mOverlay.setCameraInfo(min, max, mCameraSource.getCameraFacing());
+                    overlay.setCameraInfo(min, max, cameraSource.getCameraFacing());
                 } else {
-                    mOverlay.setCameraInfo(max, min, mCameraSource.getCameraFacing());
+                    overlay.setCameraInfo(max, min, cameraSource.getCameraFacing());
                 }
-                mOverlay.clear();
+                overlay.clear();
             }
-            mStartRequested = false;
+            startRequested = false;
         }
     }
 
@@ -117,7 +116,7 @@ public class CameraSourcePreview extends ViewGroup {
         @SuppressLint("MissingPermission")
         @Override
         public void surfaceCreated(SurfaceHolder surface) {
-            mSurfaceAvailable = true;
+            surfaceAvailable = true;
             try {
                 startIfReady();
             } catch (MobileVisionException zse) {
@@ -131,7 +130,7 @@ public class CameraSourcePreview extends ViewGroup {
 
         @Override
         public void surfaceDestroyed(SurfaceHolder surface) {
-            mSurfaceAvailable = false;
+            surfaceAvailable = false;
         }
 
         @Override
@@ -145,8 +144,8 @@ public class CameraSourcePreview extends ViewGroup {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int previewWidth = 320;
         int previewHeight = 240;
-        if (mCameraSource != null) {
-            Size size = mCameraSource.getPreviewSize();
+        if (cameraSource != null) {
+            Size size = cameraSource.getPreviewSize();
             if (size != null) {
                 previewWidth = size.getWidth();
                 previewHeight = size.getHeight();
@@ -204,7 +203,7 @@ public class CameraSourcePreview extends ViewGroup {
     }
 
     private boolean isPortraitMode() {
-        int orientation = mContext.getResources().getConfiguration().orientation;
+        int orientation = context.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             return false;
         }

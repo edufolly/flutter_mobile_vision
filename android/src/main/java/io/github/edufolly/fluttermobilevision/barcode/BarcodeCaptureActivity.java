@@ -60,9 +60,9 @@ public final class BarcodeCaptureActivity extends Activity
     public static final String BARCODE_OBJECT = "Barcode";
     public static final String ERROR = "Error";
 
-    private CameraSource mCameraSource;
-    private CameraSourcePreview mPreview;
-    private GraphicOverlay<BarcodeGraphic> mGraphicOverlay;
+    private CameraSource cameraSource;
+    private CameraSourcePreview preview;
+    private GraphicOverlay<BarcodeGraphic> graphicOverlay;
 
     private GestureDetector gestureDetector;
 
@@ -83,8 +83,8 @@ public final class BarcodeCaptureActivity extends Activity
 
             setContentView(R.layout.capture);
 
-            mPreview = findViewById(R.id.preview);
-            mGraphicOverlay = findViewById(R.id.graphic_overlay);
+            preview = findViewById(R.id.preview);
+            graphicOverlay = findViewById(R.id.graphic_overlay);
 
             autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
@@ -118,7 +118,7 @@ public final class BarcodeCaptureActivity extends Activity
                 .setBarcodeFormats(getIntent().getIntExtra(FORMATS, Barcode.ALL_FORMATS))
                 .build();
 
-        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverlay,
+        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(graphicOverlay,
                 this, showText);
 
         barcodeDetector.setProcessor(
@@ -136,7 +136,7 @@ public final class BarcodeCaptureActivity extends Activity
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        mCameraSource = new CameraSource
+        cameraSource = new CameraSource
                 .Builder(getApplicationContext(), barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
@@ -166,16 +166,16 @@ public final class BarcodeCaptureActivity extends Activity
     @Override
     protected void onPause() {
         super.onPause();
-        if (mPreview != null) {
-            mPreview.stop();
+        if (preview != null) {
+            preview.stop();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mPreview != null) {
-            mPreview.release();
+        if (preview != null) {
+            preview.release();
         }
     }
 
@@ -189,12 +189,12 @@ public final class BarcodeCaptureActivity extends Activity
             throw new MobileVisionException("Google Api Availability Error: " + code);
         }
 
-        if (mCameraSource != null) {
+        if (cameraSource != null) {
             try {
-                mPreview.start(mCameraSource, mGraphicOverlay);
+                preview.start(cameraSource, graphicOverlay);
             } catch (IOException e) {
-                mCameraSource.release();
-                mCameraSource = null;
+                cameraSource.release();
+                cameraSource = null;
                 throw new MobileVisionException("Unable to start camera source.", e);
             }
         }
@@ -214,43 +214,18 @@ public final class BarcodeCaptureActivity extends Activity
         ArrayList<Barcode> list = new ArrayList<>();
 
         if (multiple) {
-            for (BarcodeGraphic graphic : mGraphicOverlay.getGraphics()) {
+            for (BarcodeGraphic graphic : graphicOverlay.getGraphics()) {
                 list.add(graphic.getBarcode());
             }
         } else {
-            int[] location = new int[2];
-            mGraphicOverlay.getLocationOnScreen(location);
-            float x = (rawX - location[0]) / mGraphicOverlay.getWidthScaleFactor();
-            float y = (rawY - location[1]) / mGraphicOverlay.getHeightScaleFactor();
-
-            Barcode best = null;
-            float bestDistance = Float.MAX_VALUE;
-
-            for (BarcodeGraphic graphic : mGraphicOverlay.getGraphics()) {
-                Barcode barcode = graphic.getBarcode();
-                if (barcode.getBoundingBox().contains((int) x, (int) y)) {
-                    best = barcode;
-                    break;
-                }
-                float dx = x - barcode.getBoundingBox().centerX();
-                float dy = y - barcode.getBoundingBox().centerY();
-                float distance = (dx * dx) + (dy * dy);
-                if (distance < bestDistance) {
-                    best = barcode;
-                    bestDistance = distance;
-                }
-            }
-
-            if (best != null) {
-                list.add(best);
+            BarcodeGraphic graphic = graphicOverlay.getBest(rawX, rawY);
+            if (graphic != null && graphic.getBarcode() != null) {
+                list.add(graphic.getBarcode());
             }
         }
 
         if (!list.isEmpty()) {
-            Intent data = new Intent();
-            data.putExtra(BARCODE_OBJECT, list);
-            setResult(CommonStatusCodes.SUCCESS, data);
-            finish();
+            success(list);
             return true;
         }
 
@@ -262,10 +237,14 @@ public final class BarcodeCaptureActivity extends Activity
         if (!waitTap) {
             ArrayList<Barcode> list = new ArrayList<>(1);
             list.add(barcode);
-            Intent data = new Intent();
-            data.putExtra(BARCODE_OBJECT, list);
-            setResult(CommonStatusCodes.SUCCESS, data);
-            finish();
+            success(list);
         }
+    }
+
+    private void success(ArrayList<Barcode> list) {
+        Intent data = new Intent();
+        data.putExtra(BARCODE_OBJECT, list);
+        setResult(CommonStatusCodes.SUCCESS, data);
+        finish();
     }
 }

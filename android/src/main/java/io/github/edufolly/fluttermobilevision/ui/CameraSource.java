@@ -94,50 +94,50 @@ public class CameraSource {
     private static final float ASPECT_RATIO_TOLERANCE = 0.01f;
 
 
-    private Context mContext;
+    private Context context;
 
-    private final Object mCameraLock = new Object();
+    private final Object cameraLock = new Object();
 
-    private Camera mCamera;
+    private Camera camera;
 
-    private int mFacing = CAMERA_FACING_BACK;
+    private int facing = CAMERA_FACING_BACK;
 
     /**
      * Rotation of the device, and thus the associated preview images captured from the device.
      * See {@link Frame.Metadata#getRotation()}.
      */
-    private int mRotation;
+    private int rotation;
 
-    private Size mPreviewSize;
+    private Size previewSize;
 
     // These values may be requested by the caller.  Due to hardware limitations, we may need to
     // select close, but not exactly the same values for these.
-    private float mRequestedFps = 30.0f;
-    private int mRequestedPreviewWidth = 1024;
-    private int mRequestedPreviewHeight = 768;
+    private float requestedFps = 30.0f;
+    private int requestedPreviewWidth = 1024;
+    private int requestedPreviewHeight = 768;
 
-    private String mFocusMode = null;
-    private String mFlashMode = null;
+    private String focusMode = null;
+    private String flashMode = null;
 
     // These instances need to be held onto to avoid GC of their underlying resources.  Even though
     // these aren't used outside of the method that creates them, they still must have hard
     // references maintained to them.
-    private SurfaceView mDummySurfaceView;
-    private SurfaceTexture mDummySurfaceTexture;
+    private SurfaceView dummySurfaceView;
+    private SurfaceTexture dummySurfaceTexture;
 
     /**
      * Dedicated thread and associated runnable for calling into the detector with frames, as the
      * frames become available from the camera.
      */
-    private Thread mProcessingThread;
-    private FrameProcessingRunnable mFrameProcessor;
+    private Thread processingThread;
+    private FrameProcessingRunnable frameProcessor;
 
     /**
      * Map to convert between a byte array, received from the camera, and its associated byte
      * buffer.  We use byte buffers internally because this is a more efficient way to call into
      * native code later (avoids a potential copy).
      */
-    private Map<byte[], ByteBuffer> mBytesToByteBuffer = new HashMap<>();
+    private Map<byte[], ByteBuffer> bytesToByteBuffer = new HashMap<>();
 
 
     @StringDef({
@@ -172,8 +172,8 @@ public class CameraSource {
      * Builder for configuring and creating an associated camera source.
      */
     public static class Builder {
-        private final Detector<?> mDetector;
-        private CameraSource mCameraSource = new CameraSource();
+        private final Detector<?> detector;
+        private CameraSource cameraSource = new CameraSource();
 
         /**
          * Creates a camera source builder with the supplied context and detector.  Camera preview
@@ -187,8 +187,8 @@ public class CameraSource {
                 throw new IllegalArgumentException("No detector supplied.");
             }
 
-            mDetector = detector;
-            mCameraSource.mContext = context;
+            this.detector = detector;
+            cameraSource.context = context;
         }
 
         /**
@@ -199,17 +199,17 @@ public class CameraSource {
             if (fps <= 0) {
                 throw new IllegalArgumentException("Invalid fps: " + fps);
             }
-            mCameraSource.mRequestedFps = fps;
+            cameraSource.requestedFps = fps;
             return this;
         }
 
         public Builder setFocusMode(@FocusMode String mode) {
-            mCameraSource.mFocusMode = mode;
+            cameraSource.focusMode = mode;
             return this;
         }
 
         public Builder setFlashMode(@FlashMode String mode) {
-            mCameraSource.mFlashMode = mode;
+            cameraSource.flashMode = mode;
             return this;
         }
 
@@ -227,8 +227,8 @@ public class CameraSource {
             if ((width <= 0) || (width > MAX) || (height <= 0) || (height > MAX)) {
                 throw new IllegalArgumentException("Invalid preview size: " + width + "x" + height);
             }
-            mCameraSource.mRequestedPreviewWidth = width;
-            mCameraSource.mRequestedPreviewHeight = height;
+            cameraSource.requestedPreviewWidth = width;
+            cameraSource.requestedPreviewHeight = height;
             return this;
         }
 
@@ -240,7 +240,7 @@ public class CameraSource {
             if ((facing != CAMERA_FACING_BACK) && (facing != CAMERA_FACING_FRONT)) {
                 throw new IllegalArgumentException("Invalid camera: " + facing);
             }
-            mCameraSource.mFacing = facing;
+            cameraSource.facing = facing;
             return this;
         }
 
@@ -248,8 +248,8 @@ public class CameraSource {
          * Creates an instance of the camera source.
          */
         public CameraSource build() {
-            mCameraSource.mFrameProcessor = mCameraSource.new FrameProcessingRunnable(mDetector);
-            return mCameraSource;
+            cameraSource.frameProcessor = cameraSource.new FrameProcessingRunnable(detector);
+            return cameraSource;
         }
     }
 
@@ -324,9 +324,9 @@ public class CameraSource {
      * Stops the camera and releases the resources of the camera and underlying detector.
      */
     public void release() {
-        synchronized (mCameraLock) {
+        synchronized (cameraLock) {
             stop();
-            mFrameProcessor.release();
+            frameProcessor.release();
         }
     }
 
@@ -339,27 +339,27 @@ public class CameraSource {
     @SuppressLint("MissingPermission")
     @RequiresPermission(Manifest.permission.CAMERA)
     public CameraSource start() throws IOException, MobileVisionException {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
+        synchronized (cameraLock) {
+            if (camera != null) {
                 return this;
             }
 
-            mCamera = createCamera();
+            camera = createCamera();
 
             // SurfaceTexture was introduced in Honeycomb (11), so if we are running and
             // old version of Android. fall back to use SurfaceView.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                mDummySurfaceTexture = new SurfaceTexture(DUMMY_TEXTURE_NAME);
-                mCamera.setPreviewTexture(mDummySurfaceTexture);
+                dummySurfaceTexture = new SurfaceTexture(DUMMY_TEXTURE_NAME);
+                camera.setPreviewTexture(dummySurfaceTexture);
             } else {
-                mDummySurfaceView = new SurfaceView(mContext);
-                mCamera.setPreviewDisplay(mDummySurfaceView.getHolder());
+                dummySurfaceView = new SurfaceView(context);
+                camera.setPreviewDisplay(dummySurfaceView.getHolder());
             }
-            mCamera.startPreview();
+            camera.startPreview();
 
-            mProcessingThread = new Thread(mFrameProcessor);
-            mFrameProcessor.setActive(true);
-            mProcessingThread.start();
+            processingThread = new Thread(frameProcessor);
+            frameProcessor.setActive(true);
+            processingThread.start();
         }
         return this;
     }
@@ -376,18 +376,18 @@ public class CameraSource {
     public CameraSource start(SurfaceHolder surfaceHolder)
             throws IOException, MobileVisionException {
 
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
+        synchronized (cameraLock) {
+            if (camera != null) {
                 return this;
             }
 
-            mCamera = createCamera();
-            mCamera.setPreviewDisplay(surfaceHolder);
-            mCamera.startPreview();
+            camera = createCamera();
+            camera.setPreviewDisplay(surfaceHolder);
+            camera.startPreview();
 
-            mProcessingThread = new Thread(mFrameProcessor);
-            mFrameProcessor.setActive(true);
-            mProcessingThread.start();
+            processingThread = new Thread(frameProcessor);
+            frameProcessor.setActive(true);
+            processingThread.start();
         }
         return this;
     }
@@ -402,43 +402,44 @@ public class CameraSource {
      * resources of the underlying detector.
      */
     public void stop() {
-        synchronized (mCameraLock) {
-            mFrameProcessor.setActive(false);
-            if (mProcessingThread != null) {
+        synchronized (cameraLock) {
+            frameProcessor.setActive(false);
+            if (processingThread != null) {
                 try {
                     // Wait for the thread to complete to ensure that we can't have multiple threads
                     // executing at the same time (i.e., which would happen if we called start too
                     // quickly after stop).
-                    mProcessingThread.join();
+                    processingThread.join();
                 } catch (InterruptedException e) {
                     Log.d(TAG, "Frame processing thread interrupted on release.");
                 }
-                mProcessingThread = null;
+                processingThread = null;
             }
 
             // clear the buffer to prevent oom exceptions
-            mBytesToByteBuffer.clear();
+            bytesToByteBuffer.clear();
 
-            if (mCamera != null) {
-                mCamera.stopPreview();
-                mCamera.setPreviewCallbackWithBuffer(null);
+            if (camera != null) {
+                camera.stopPreview();
+                camera.setPreviewCallbackWithBuffer(null);
                 try {
                     // We want to be compatible back to Gingerbread, but SurfaceTexture
-                    // wasn't introduced until Honeycomb.  Since the interface cannot use a SurfaceTexture, if the
-                    // developer wants to display a preview we must use a SurfaceHolder.  If the developer doesn't
-                    // want to display a preview we use a SurfaceTexture if we are running at least Honeycomb.
+                    // wasn't introduced until Honeycomb.  Since the interface cannot use a
+                    // SurfaceTexture, if the developer wants to display a preview we must use a
+                    // SurfaceHolder.  If the developer doesn't want to display a preview we use a
+                    // SurfaceTexture if we are running at least Honeycomb.
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        mCamera.setPreviewTexture(null);
+                        camera.setPreviewTexture(null);
 
                     } else {
-                        mCamera.setPreviewDisplay(null);
+                        camera.setPreviewDisplay(null);
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to clear camera preview: " + e);
                 }
-                mCamera.release();
-                mCamera = null;
+                camera.release();
+                camera = null;
             }
         }
     }
@@ -447,7 +448,7 @@ public class CameraSource {
      * Returns the preview size that is currently in use by the underlying camera.
      */
     public Size getPreviewSize() {
-        return mPreviewSize;
+        return previewSize;
     }
 
     /**
@@ -455,17 +456,17 @@ public class CameraSource {
      * {@link #CAMERA_FACING_FRONT}.
      */
     public int getCameraFacing() {
-        return mFacing;
+        return facing;
     }
 
     public int doZoom(float scale) {
-        synchronized (mCameraLock) {
-            if (mCamera == null) {
+        synchronized (cameraLock) {
+            if (camera == null) {
                 return 0;
             }
             int currentZoom = 0;
             int maxZoom;
-            Camera.Parameters parameters = mCamera.getParameters();
+            Camera.Parameters parameters = camera.getParameters();
             if (!parameters.isZoomSupported()) {
                 Log.w(TAG, "Zoom is not supported on this device");
                 return currentZoom;
@@ -486,7 +487,7 @@ public class CameraSource {
                 currentZoom = maxZoom;
             }
             parameters.setZoom(currentZoom);
-            mCamera.setParameters(parameters);
+            camera.setParameters(parameters);
             return currentZoom;
         }
     }
@@ -501,13 +502,13 @@ public class CameraSource {
      * @param jpeg    the callback for JPEG image data, or null
      */
     public void takePicture(ShutterCallback shutter, PictureCallback jpeg) {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
+        synchronized (cameraLock) {
+            if (camera != null) {
                 PictureStartCallback startCallback = new PictureStartCallback();
                 startCallback.mDelegate = shutter;
                 PictureDoneCallback doneCallback = new PictureDoneCallback();
                 doneCallback.mDelegate = jpeg;
-                mCamera.takePicture(startCallback, null, null, doneCallback);
+                camera.takePicture(startCallback, null, null, doneCallback);
             }
         }
     }
@@ -515,8 +516,8 @@ public class CameraSource {
     /**
      * Gets the current focus mode setting.
      *
-     * @return current focus mode. This value is null if the camera is not yet created. Applications should call {@link
-     * #autoFocus(AutoFocusCallback)} to start the focus if focus
+     * @return current focus mode. This value is null if the camera is not yet created.
+     * Applications should call {@link #autoFocus(AutoFocusCallback)} to start the focus if focus
      * mode is FOCUS_MODE_AUTO or FOCUS_MODE_MACRO.
      * @see Camera.Parameters#FOCUS_MODE_AUTO
      * @see Camera.Parameters#FOCUS_MODE_INFINITY
@@ -529,7 +530,7 @@ public class CameraSource {
     @Nullable
     @FocusMode
     public String getFocusMode() {
-        return mFocusMode;
+        return focusMode;
     }
 
     /**
@@ -540,13 +541,13 @@ public class CameraSource {
      * @see #getFocusMode()
      */
     public boolean setFocusMode(@FocusMode String mode) {
-        synchronized (mCameraLock) {
-            if (mCamera != null && mode != null) {
-                Camera.Parameters parameters = mCamera.getParameters();
+        synchronized (cameraLock) {
+            if (camera != null && mode != null) {
+                Camera.Parameters parameters = camera.getParameters();
                 if (parameters.getSupportedFocusModes().contains(mode)) {
                     parameters.setFocusMode(mode);
-                    mCamera.setParameters(parameters);
-                    mFocusMode = mode;
+                    camera.setParameters(parameters);
+                    focusMode = mode;
                     return true;
                 }
             }
@@ -569,7 +570,7 @@ public class CameraSource {
     @Nullable
     @FlashMode
     public String getFlashMode() {
-        return mFlashMode;
+        return flashMode;
     }
 
     /**
@@ -580,13 +581,13 @@ public class CameraSource {
      * @see #getFlashMode()
      */
     public boolean setFlashMode(@FlashMode String mode) {
-        synchronized (mCameraLock) {
-            if (mCamera != null && mode != null) {
-                Camera.Parameters parameters = mCamera.getParameters();
+        synchronized (cameraLock) {
+            if (camera != null && mode != null) {
+                Camera.Parameters parameters = camera.getParameters();
                 if (parameters.getSupportedFlashModes().contains(mode)) {
                     parameters.setFlashMode(mode);
-                    mCamera.setParameters(parameters);
-                    mFlashMode = mode;
+                    camera.setParameters(parameters);
+                    flashMode = mode;
                     return true;
                 }
             }
@@ -598,7 +599,8 @@ public class CameraSource {
     /**
      * Starts camera auto-focus and registers a callback function to run when
      * the camera is focused.  This method is only valid when preview is active
-     * (between {@link #start()} or {@link #start(SurfaceHolder)} and before {@link #stop()} or {@link #release()}).
+     * (between {@link #start()} or {@link #start(SurfaceHolder)} and before {@link #stop()}
+     * or {@link #release()}).
      * <p/>
      * <p>Callers should check
      * {@link #getFocusMode()} to determine if
@@ -614,14 +616,14 @@ public class CameraSource {
      * @see #cancelAutoFocus()
      */
     public void autoFocus(@Nullable AutoFocusCallback cb) {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
+        synchronized (cameraLock) {
+            if (camera != null) {
                 CameraAutoFocusCallback autoFocusCallback = null;
                 if (cb != null) {
                     autoFocusCallback = new CameraAutoFocusCallback();
                     autoFocusCallback.mDelegate = cb;
                 }
-                mCamera.autoFocus(autoFocusCallback);
+                camera.autoFocus(autoFocusCallback);
             }
         }
     }
@@ -635,9 +637,9 @@ public class CameraSource {
      * @see #autoFocus(AutoFocusCallback)
      */
     public void cancelAutoFocus() {
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
-                mCamera.cancelAutoFocus();
+        synchronized (cameraLock) {
+            if (camera != null) {
+                camera.cancelAutoFocus();
             }
         }
     }
@@ -646,7 +648,8 @@ public class CameraSource {
      * Sets camera auto-focus move callback.
      *
      * @param cb the callback to run
-     * @return {@code true} if the operation is supported (i.e. from Jelly Bean), {@code false} otherwise
+     * @return {@code true} if the operation is supported (i.e. from Jelly Bean), {@code false}
+     * otherwise
      */
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public boolean setAutoFocusMoveCallback(@Nullable AutoFocusMoveCallback cb) {
@@ -654,14 +657,14 @@ public class CameraSource {
             return false;
         }
 
-        synchronized (mCameraLock) {
-            if (mCamera != null) {
+        synchronized (cameraLock) {
+            if (camera != null) {
                 CameraAutoFocusMoveCallback autoFocusMoveCallback = null;
                 if (cb != null) {
                     autoFocusMoveCallback = new CameraAutoFocusMoveCallback();
                     autoFocusMoveCallback.mDelegate = cb;
                 }
-                mCamera.setAutoFocusMoveCallback(autoFocusMoveCallback);
+                camera.setAutoFocusMoveCallback(autoFocusMoveCallback);
             }
         }
 
@@ -704,9 +707,9 @@ public class CameraSource {
             if (mDelegate != null) {
                 mDelegate.onPictureTaken(data);
             }
-            synchronized (mCameraLock) {
-                if (mCamera != null) {
-                    mCamera.startPreview();
+            synchronized (cameraLock) {
+                if (CameraSource.this.camera != null) {
+                    CameraSource.this.camera.startPreview();
                 }
             }
         }
@@ -748,20 +751,20 @@ public class CameraSource {
      */
     @SuppressLint("InlinedApi")
     private Camera createCamera() throws MobileVisionException {
-        int requestedCameraId = getIdForRequestedCamera(mFacing);
+        int requestedCameraId = getIdForRequestedCamera(facing);
         if (requestedCameraId == -1) {
             throw new MobileVisionException("Could not find requested camera.");
         }
         Camera camera = Camera.open(requestedCameraId);
 
-        SizePair sizePair = selectSizePair(camera, mRequestedPreviewWidth, mRequestedPreviewHeight);
+        SizePair sizePair = selectSizePair(camera, requestedPreviewWidth, requestedPreviewHeight);
         if (sizePair == null) {
             throw new MobileVisionException("Could not find suitable preview size.");
         }
         Size pictureSize = sizePair.pictureSize();
-        mPreviewSize = sizePair.previewSize();
+        previewSize = sizePair.previewSize();
 
-        int[] previewFpsRange = selectPreviewFpsRange(camera, mRequestedFps);
+        int[] previewFpsRange = selectPreviewFpsRange(camera, requestedFps);
         if (previewFpsRange == null) {
             throw new MobileVisionException("Could not find suitable preview frames per second range.");
         }
@@ -772,7 +775,7 @@ public class CameraSource {
             parameters.setPictureSize(pictureSize.getWidth(), pictureSize.getHeight());
         }
 
-        parameters.setPreviewSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
         parameters.setPreviewFpsRange(
                 previewFpsRange[Camera.Parameters.PREVIEW_FPS_MIN_INDEX],
                 previewFpsRange[Camera.Parameters.PREVIEW_FPS_MAX_INDEX]);
@@ -780,29 +783,31 @@ public class CameraSource {
 
         setRotation(camera, parameters, requestedCameraId);
 
-        if (mFocusMode != null) {
+        if (focusMode != null) {
             if (parameters.getSupportedFocusModes().contains(
-                    mFocusMode)) {
-                parameters.setFocusMode(mFocusMode);
+                    focusMode)) {
+                parameters.setFocusMode(focusMode);
             } else {
-                Log.i(TAG, "Camera focus mode: " + mFocusMode + " is not supported on this device.");
+                Log.i(TAG, "Camera focus mode: " + focusMode +
+                        " is not supported on this device.");
             }
         }
 
-        // setting mFocusMode to the one set in the params
-        mFocusMode = parameters.getFocusMode();
+        // setting focusMode to the one set in the params
+        focusMode = parameters.getFocusMode();
 
-        if (mFlashMode != null && parameters.getSupportedFlashModes() != null) {
+        if (flashMode != null) {
             if (parameters.getSupportedFlashModes().contains(
-                    mFlashMode)) {
-                parameters.setFlashMode(mFlashMode);
+                    flashMode)) {
+                parameters.setFlashMode(flashMode);
             } else {
-                Log.i(TAG, "Camera flash mode: " + mFlashMode + " is not supported on this device.");
+                Log.i(TAG, "Camera flash mode: " + flashMode +
+                        " is not supported on this device.");
             }
         }
 
-        // setting mFlashMode to the one set in the params
-        mFlashMode = parameters.getFlashMode();
+        // setting flashMode to the one set in the params
+        flashMode = parameters.getFlashMode();
 
         camera.setParameters(parameters);
 
@@ -812,10 +817,10 @@ public class CameraSource {
         //   one for the next pending frame to process immediately upon completing detection
         //   two for the frames that the camera uses to populate future preview images
         camera.setPreviewCallbackWithBuffer(new CameraPreviewCallback());
-        camera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        camera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        camera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
-        camera.addCallbackBuffer(createPreviewBuffer(mPreviewSize));
+        camera.addCallbackBuffer(createPreviewBuffer(previewSize));
+        camera.addCallbackBuffer(createPreviewBuffer(previewSize));
+        camera.addCallbackBuffer(createPreviewBuffer(previewSize));
+        camera.addCallbackBuffer(createPreviewBuffer(previewSize));
 
         return camera;
     }
@@ -987,7 +992,7 @@ public class CameraSource {
      */
     private void setRotation(Camera camera, Camera.Parameters parameters, int cameraId) {
         WindowManager windowManager =
-                (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+                (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         int degrees = 0;
         int rotation = windowManager.getDefaultDisplay().getRotation();
         switch (rotation) {
@@ -1015,14 +1020,14 @@ public class CameraSource {
         int displayAngle;
         if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             angle = (cameraInfo.orientation + degrees) % 360;
-            displayAngle = (360 - angle) % 360; // compensate for it being mirrored
+            displayAngle = (360 - angle); // compensate for it being mirrored
         } else {  // back-facing
             angle = (cameraInfo.orientation - degrees + 360) % 360;
             displayAngle = angle;
         }
 
         // This corresponds to the rotation constants in {@link Frame}.
-        mRotation = angle / 90;
+        this.rotation = angle / 90;
 
         camera.setDisplayOrientation(displayAngle);
         parameters.setRotation(angle);
@@ -1053,7 +1058,7 @@ public class CameraSource {
             throw new IllegalStateException("Failed to create valid buffer for camera source.");
         }
 
-        mBytesToByteBuffer.put(byteArray, buffer);
+        bytesToByteBuffer.put(byteArray, buffer);
         return byteArray;
     }
 
@@ -1067,7 +1072,7 @@ public class CameraSource {
     private class CameraPreviewCallback implements Camera.PreviewCallback {
         @Override
         public void onPreviewFrame(byte[] data, Camera camera) {
-            mFrameProcessor.setNextFrame(data, camera);
+            frameProcessor.setNextFrame(data, camera);
         }
     }
 
@@ -1104,7 +1109,7 @@ public class CameraSource {
          */
         @SuppressLint("Assert")
         private void release() {
-            assert (mProcessingThread.getState() == State.TERMINATED);
+            assert (processingThread.getState() == State.TERMINATED);
             mDetector.release();
             mDetector = null;
         }
@@ -1131,7 +1136,7 @@ public class CameraSource {
                     mPendingFrameData = null;
                 }
 
-                if (!mBytesToByteBuffer.containsKey(data)) {
+                if (!bytesToByteBuffer.containsKey(data)) {
                     Log.d(TAG,
                             "Skipping frame.  Could not find ByteBuffer associated with the image " +
                                     "data from the camera.");
@@ -1142,7 +1147,7 @@ public class CameraSource {
                 // idea of the timing of frames received and when frames were dropped along the way.
                 mPendingTimeMillis = SystemClock.elapsedRealtime() - mStartTimeMillis;
                 mPendingFrameId++;
-                mPendingFrameData = mBytesToByteBuffer.get(data);
+                mPendingFrameData = bytesToByteBuffer.get(data);
 
                 // Notify the processor thread if it is waiting on the next frame (see below).
                 mLock.notifyAll();
@@ -1190,11 +1195,11 @@ public class CameraSource {
                     }
 
                     outputFrame = new Frame.Builder()
-                            .setImageData(mPendingFrameData, mPreviewSize.getWidth(),
-                                    mPreviewSize.getHeight(), ImageFormat.NV21)
+                            .setImageData(mPendingFrameData, previewSize.getWidth(),
+                                    previewSize.getHeight(), ImageFormat.NV21)
                             .setId(mPendingFrameId)
                             .setTimestampMillis(mPendingTimeMillis)
-                            .setRotation(mRotation)
+                            .setRotation(rotation)
                             .build();
 
                     // Hold onto the frame data locally, so that we can use this for detection
@@ -1213,7 +1218,7 @@ public class CameraSource {
                 } catch (Throwable t) {
                     Log.e(TAG, "Exception thrown from receiver.", t);
                 } finally {
-                    mCamera.addCallbackBuffer(data.array());
+                    camera.addCallbackBuffer(data.array());
                 }
             }
         }

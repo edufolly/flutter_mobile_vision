@@ -34,67 +34,48 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
     private static final int COLOR_CHOICES[] = {
             Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW
     };
-    private static int mCurrentColorIndex;
-    private int mId;
-    private Paint mRectPaint;
-    private Paint mTextPaint;
-    private volatile Barcode mBarcode;
+    private static int currentColorIndex;
+    private Paint rectPaint;
+    private Paint textPaint;
+    private volatile Barcode barcode;
 
     static {
-        mCurrentColorIndex = 0;
+        currentColorIndex = 0;
     }
 
     BarcodeGraphic(GraphicOverlay overlay, boolean showText) {
         super(overlay);
 
+        currentColorIndex = (currentColorIndex + 1) % COLOR_CHOICES.length;
+        final int selectedColor = COLOR_CHOICES[currentColorIndex];
 
-        mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
-        final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
-
-        mRectPaint = new Paint();
-        mRectPaint.setColor(selectedColor);
-        mRectPaint.setStyle(Paint.Style.STROKE);
-        mRectPaint.setStrokeWidth(4.0f);
+        rectPaint = new Paint();
+        rectPaint.setColor(selectedColor);
+        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStrokeWidth(4.0f);
 
         if (showText) {
-            mTextPaint = new Paint();
-            mTextPaint.setColor(selectedColor);
-            mTextPaint.setTextSize(36.0f);
+            textPaint = new Paint();
+            textPaint.setColor(selectedColor);
+            textPaint.setTextSize(36.0f);
         }
-    }
-
-    public int getId() {
-        return mId;
-    }
-
-    public void setId(int id) {
-        this.mId = id;
     }
 
     public Barcode getBarcode() {
-        return mBarcode;
+        return barcode;
     }
 
-
     /**
-     * Checks whether a point is within the bounding box of this graphic.
-     * The provided point should be relative to this graphic's containing overlay.
-     *
-     * @param x An x parameter in the relative context of the canvas.
-     * @param y A y parameter in the relative context of the canvas.
-     * @return True if the provided point is contained within this graphic's bounding box.
+     * @return RectF that represents the graphic's bounding box.
      */
-    public boolean contains(float x, float y) {
-        Barcode barcode = mBarcode;
+    public RectF getBoundingBox() {
+        Barcode barcode = this.barcode;
         if (barcode == null) {
-            return false;
+            return null;
         }
         RectF rect = new RectF(barcode.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
-        return (rect.left < x && rect.right > x && rect.top < y && rect.bottom > y);
+        rect = translateRect(rect);
+        return rect;
     }
 
     /**
@@ -102,7 +83,7 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
      * relevant portions of the overlay to trigger a redraw.
      */
     public void updateItem(Barcode barcode) {
-        mBarcode = barcode;
+        this.barcode = barcode;
         postInvalidate();
     }
 
@@ -111,22 +92,19 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
      */
     @Override
     public void draw(Canvas canvas) {
-        Barcode barcode = mBarcode;
+        Barcode barcode = this.barcode;
         if (barcode == null) {
             return;
         }
 
         // Draws the bounding box around the barcode.
         RectF rect = new RectF(barcode.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
-        canvas.drawRect(rect, mRectPaint);
+        rect = translateRect(rect);
+        canvas.drawRect(rect, rectPaint);
 
-        if (mTextPaint != null) {
+        if (textPaint != null) {
             // Draws a label at the bottom of the barcode indicate the barcode value that was detected.
-            canvas.drawText(barcode.rawValue, rect.left, rect.bottom, mTextPaint);
+            canvas.drawText(barcode.rawValue, rect.left, rect.bottom, textPaint);
         }
     }
 }

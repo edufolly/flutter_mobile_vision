@@ -23,8 +23,6 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
 
-import io.github.edufolly.fluttermobilevision.barcode.BarcodeGraphic;
-import io.github.edufolly.fluttermobilevision.barcode.BarcodeGraphicTracker;
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 
@@ -33,23 +31,23 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
  * multi-processor uses this factory to create barcode trackers as needed -- one for each barcode.
  */
 public class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
-    private GraphicOverlay<BarcodeGraphic> mGraphicOverlay;
-    private Context mContext;
+    private GraphicOverlay<BarcodeGraphic> graphicOverlay;
+    private Context context;
     private boolean showText;
 
-    public BarcodeTrackerFactory(GraphicOverlay<BarcodeGraphic> mGraphicOverlay,
-                                 Context mContext, boolean showText) {
+    public BarcodeTrackerFactory(GraphicOverlay<BarcodeGraphic> graphicOverlay,
+                                 Context context, boolean showText) {
 
-        this.mGraphicOverlay = mGraphicOverlay;
-        this.mContext = mContext;
+        this.graphicOverlay = graphicOverlay;
+        this.context = context;
         this.showText = showText;
     }
 
     @Override
     public Tracker<Barcode> create(Barcode barcode) {
-        BarcodeGraphic graphic = new BarcodeGraphic(mGraphicOverlay, showText);
+        BarcodeGraphic graphic = new BarcodeGraphic(graphicOverlay, showText);
         try {
-            return new BarcodeGraphicTracker(mGraphicOverlay, graphic, mContext);
+            return new BarcodeGraphicTracker(graphicOverlay, graphic, context);
         } catch (Exception ex) {
             Log.d("BarcodeTrackerFactory", ex.getMessage(), ex);
         }

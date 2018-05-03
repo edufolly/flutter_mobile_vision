@@ -35,19 +35,18 @@ import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 public class OcrGraphic extends GraphicOverlay.Graphic {
 
     private static final int TEXT_COLOR = Color.WHITE;
-    private static final Paint sRectPaint = new Paint();
-    private static final Paint sTextPaint = new Paint();
+    private static final Paint rectPaint = new Paint();
+    private static final Paint textPaint = new Paint();
 
     static {
-        sRectPaint.setColor(TEXT_COLOR);
-        sRectPaint.setStyle(Paint.Style.STROKE);
-        sRectPaint.setStrokeWidth(4.0f);
+        rectPaint.setColor(TEXT_COLOR);
+        rectPaint.setStyle(Paint.Style.STROKE);
+        rectPaint.setStrokeWidth(4.0f);
 
-        sTextPaint.setColor(TEXT_COLOR);
-        sTextPaint.setTextSize(50.0f);
+        textPaint.setColor(TEXT_COLOR);
+        textPaint.setTextSize(50.0f);
     }
 
-    private int mId;
     private boolean showText;
     private final TextBlock textBlock;
 
@@ -60,37 +59,21 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
         postInvalidate();
     }
 
-    public int getId() {
-        return mId;
-    }
-
-    public void setId(int id) {
-        this.mId = id;
-    }
-
     public TextBlock getTextBlock() {
         return textBlock;
     }
 
     /**
-     * Checks whether a point is within the bounding box of this graphic.
-     * The provided point should be relative to this graphic's containing overlay.
-     *
-     * @param x An x parameter in the relative context of the canvas.
-     * @param y A y parameter in the relative context of the canvas.
-     * @return True if the provided point is contained within this graphic's bounding box.
+     * @return RectF that represents the graphic's bounding box.
      */
-    public boolean contains(float x, float y) {
-        TextBlock text = textBlock;
-        if (text == null) {
-            return false;
+    public RectF getBoundingBox() {
+        TextBlock textBlock = this.textBlock;
+        if (textBlock == null) {
+            return null;
         }
-        RectF rect = new RectF(text.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
-        return (rect.left < x && rect.right > x && rect.top < y && rect.bottom > y);
+        RectF rect = new RectF(textBlock.getBoundingBox());
+        rect = translateRect(rect);
+        return rect;
     }
 
     /**
@@ -105,11 +88,8 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
 
         // Draws the bounding box around the TextBlock.
         RectF rect = new RectF(text.getBoundingBox());
-        rect.left = translateX(rect.left);
-        rect.top = translateY(rect.top);
-        rect.right = translateX(rect.right);
-        rect.bottom = translateY(rect.bottom);
-        canvas.drawRect(rect, sRectPaint);
+        rect = translateRect(rect);
+        canvas.drawRect(rect, rectPaint);
 
         // Break the text into multiple lines and draw each one according to its own bounding box.
         List<? extends Text> textComponents = text.getComponents();
@@ -117,7 +97,7 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
             float left = translateX(currentText.getBoundingBox().left);
             float bottom = translateY(currentText.getBoundingBox().bottom);
             if (showText) {
-                canvas.drawText(currentText.getValue(), left, bottom, sTextPaint);
+                canvas.drawText(currentText.getValue(), left, bottom, textPaint);
             }
         }
     }

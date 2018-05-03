@@ -34,7 +34,6 @@ import android.view.WindowManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
@@ -55,9 +54,9 @@ public final class OcrCaptureActivity extends Activity {
     public static final String TEXT_OBJECT = "Text";
     public static final String ERROR = "Error";
 
-    private CameraSource mCameraSource;
-    private CameraSourcePreview mPreview;
-    private GraphicOverlay<OcrGraphic> mGraphicOverlay;
+    private CameraSource cameraSource;
+    private CameraSourcePreview preview;
+    private GraphicOverlay<OcrGraphic> graphicOverlay;
 
     private GestureDetector gestureDetector;
 
@@ -77,8 +76,8 @@ public final class OcrCaptureActivity extends Activity {
 
             setContentView(R.layout.capture);
 
-            mPreview = findViewById(R.id.preview);
-            mGraphicOverlay = findViewById(R.id.graphic_overlay);
+            preview = findViewById(R.id.preview);
+            graphicOverlay = findViewById(R.id.graphic_overlay);
 
             useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
             autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
@@ -109,7 +108,7 @@ public final class OcrCaptureActivity extends Activity {
         Context context = getApplicationContext();
 
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context).build();
-        textRecognizer.setProcessor(new OcrDetectorProcessor(mGraphicOverlay, showText));
+        textRecognizer.setProcessor(new OcrDetectorProcessor(graphicOverlay, showText));
 
         if (!textRecognizer.isOperational()) {
             IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
@@ -123,7 +122,7 @@ public final class OcrCaptureActivity extends Activity {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        mCameraSource = new CameraSource
+        cameraSource = new CameraSource
                 .Builder(getApplicationContext(), textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
@@ -153,16 +152,16 @@ public final class OcrCaptureActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (mPreview != null) {
-            mPreview.stop();
+        if (preview != null) {
+            preview.stop();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mPreview != null) {
-            mPreview.release();
+        if (preview != null) {
+            preview.release();
         }
     }
 
@@ -176,12 +175,12 @@ public final class OcrCaptureActivity extends Activity {
             throw new MobileVisionException("Google Api Availability Error: " + code);
         }
 
-        if (mCameraSource != null) {
+        if (cameraSource != null) {
             try {
-                mPreview.start(mCameraSource, mGraphicOverlay);
+                preview.start(cameraSource, graphicOverlay);
             } catch (IOException e) {
-                mCameraSource.release();
-                mCameraSource = null;
+                cameraSource.release();
+                cameraSource = null;
                 throw new MobileVisionException("Unable to start camera source.", e);
             }
         }
@@ -198,35 +197,13 @@ public final class OcrCaptureActivity extends Activity {
         ArrayList<MyTextBlock> list = new ArrayList<>();
 
         if (multiple) {
-            for (OcrGraphic graphic : mGraphicOverlay.getGraphics()) {
+            for (OcrGraphic graphic : graphicOverlay.getGraphics()) {
                 list.add(new MyTextBlock(graphic.getTextBlock()));
             }
         } else {
-            int[] location = new int[2];
-            mGraphicOverlay.getLocationOnScreen(location);
-            float x = (rawX - location[0]) / mGraphicOverlay.getWidthScaleFactor();
-            float y = (rawY - location[1]) / mGraphicOverlay.getHeightScaleFactor();
-
-            TextBlock best = null;
-            float bestDistance = Float.MAX_VALUE;
-
-            for (OcrGraphic graphic : mGraphicOverlay.getGraphics()) {
-                TextBlock textBlock = graphic.getTextBlock();
-                if (textBlock.getBoundingBox().contains((int) x, (int) y)) {
-                    best = textBlock;
-                    break;
-                }
-                float dx = x - textBlock.getBoundingBox().centerX();
-                float dy = y - textBlock.getBoundingBox().centerY();
-                float distance = (dx * dx) + (dy * dy);
-                if (distance < bestDistance) {
-                    best = textBlock;
-                    bestDistance = distance;
-                }
-            }
-
-            if (best != null) {
-                list.add(new MyTextBlock(best));
+            OcrGraphic graphic = graphicOverlay.getBest(rawX, rawY);
+            if (graphic != null && graphic.getTextBlock() != null) {
+                list.add(new MyTextBlock(graphic.getTextBlock()));
             }
         }
 
