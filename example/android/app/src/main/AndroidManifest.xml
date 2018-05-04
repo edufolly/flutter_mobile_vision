@@ -51,6 +51,7 @@
 
         <activity android:name="io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity" />
         <activity android:name="io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity" />
+        <activity android:name="io.github.edufolly.fluttermobilevision.face.FaceCaptureActivity" />
 
     </application>
 </manifest>

@@ -15,7 +15,6 @@
  */
 package io.github.edufolly.fluttermobilevision.barcode;
 
-import android.content.Context;
 import android.util.Log;
 
 
@@ -25,21 +24,16 @@ import com.google.android.gms.vision.barcode.Barcode;
 
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
-
-/**
- * Factory for creating a tracker and associated graphic to be associated with a new barcode.  The
- * multi-processor uses this factory to create barcode trackers as needed -- one for each barcode.
- */
 public class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
     private GraphicOverlay<BarcodeGraphic> graphicOverlay;
-    private Context context;
+    private BarcodeUpdateListener barcodeUpdateListener;
     private boolean showText;
 
     public BarcodeTrackerFactory(GraphicOverlay<BarcodeGraphic> graphicOverlay,
-                                 Context context, boolean showText) {
+                                 BarcodeUpdateListener barcodeUpdateListener, boolean showText) {
 
         this.graphicOverlay = graphicOverlay;
-        this.context = context;
+        this.barcodeUpdateListener = barcodeUpdateListener;
         this.showText = showText;
     }
 
@@ -47,7 +41,7 @@ public class BarcodeTrackerFactory implements MultiProcessor.Factory<Barcode> {
     public Tracker<Barcode> create(Barcode barcode) {
         BarcodeGraphic graphic = new BarcodeGraphic(graphicOverlay, showText);
         try {
-            return new BarcodeGraphicTracker(graphicOverlay, graphic, context);
+            return new BarcodeGraphicTracker(graphicOverlay, graphic, barcodeUpdateListener);
         } catch (Exception ex) {
             Log.d("BarcodeTrackerFactory", ex.getMessage(), ex);
         }

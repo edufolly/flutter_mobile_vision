@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
+import 'package:flutter_mobile_vision_example/barcode_details.dart';
+import 'package:flutter_mobile_vision_example/ocr_text_details.dart';
 
 void main() => runApp(new MyApp());
 
@@ -25,6 +27,12 @@ class _MyAppState extends State<MyApp> {
   bool _showTextOcr = true;
   List<OcrText> _textsOcr = [];
 
+  bool _autoFocusFace = true;
+  bool _torchFace = false;
+  bool _multipleFace = true;
+  bool _showTextFace = true;
+  List<Face> _faces = [];
+
   @override
   void initState() {
     super.initState();
@@ -38,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         buttonColor: Colors.lime,
       ),
       home: new DefaultTabController(
-        length: 2,
+        length: 3,
         child: new Scaffold(
           appBar: new AppBar(
             bottom: new TabBar(
@@ -46,6 +54,7 @@ class _MyAppState extends State<MyApp> {
               tabs: [
                 new Tab(text: 'Barcode'),
                 new Tab(text: 'OCR'),
+                new Tab(text: 'Face')
               ],
             ),
             title: new Text('Flutter Mobile Vision'),
@@ -53,6 +62,7 @@ class _MyAppState extends State<MyApp> {
           body: new TabBarView(children: [
             _getScanScreen(context),
             _getOcrScreen(context),
+            _getFaceScreen(context),
           ]),
         ),
       ),
@@ -279,6 +289,90 @@ class _MyAppState extends State<MyApp> {
 
     setState(() => _textsOcr = texts);
   }
+
+  ///
+  /// Face Screen
+  ///
+  Widget _getFaceScreen(BuildContext context) {
+    List<Widget> items = [];
+
+    items.add(new SwitchListTile(
+      title: const Text('Auto focus:'),
+      value: _autoFocusFace,
+      onChanged: (value) => setState(() => _autoFocusFace = value),
+    ));
+
+    items.add(new SwitchListTile(
+      title: const Text('Torch:'),
+      value: _torchFace,
+      onChanged: (value) => setState(() => _torchFace = value),
+    ));
+
+    items.add(new SwitchListTile(
+      title: const Text('Multiple:'),
+      value: _multipleFace,
+      onChanged: (value) => setState(() => _multipleFace = value),
+    ));
+
+    items.add(new SwitchListTile(
+      title: const Text('Show text:'),
+      value: _showTextFace,
+      onChanged: (value) => setState(() => _showTextFace = value),
+    ));
+
+    items.add(
+      new Padding(
+        padding: const EdgeInsets.only(
+          left: 18.0,
+          right: 18.0,
+          bottom: 12.0,
+        ),
+        child: new RaisedButton(
+          onPressed: _face,
+          child: new Text('DETECT!'),
+        ),
+      ),
+    );
+
+    items.addAll(
+      ListTile.divideTiles(
+        context: context,
+        tiles: _faces
+            .map(
+              (face) => new FaceWidget(face),
+            )
+            .toList(),
+      ),
+    );
+
+    return new ListView(
+      padding: const EdgeInsets.only(
+        top: 12.0,
+      ),
+      children: items,
+    );
+  }
+
+  ///
+  /// Face Method
+  ///
+  Future<Null> _face() async {
+    List<Face> faces = [];
+    try {
+      faces = await FlutterMobileVision.face(
+        flash: _torchFace,
+        autoFocus: _autoFocusFace,
+        multiple: _multipleFace,
+        showText: _showTextFace,
+      );
+    } on Exception catch (e) {
+      faces.add(new Face(-1));
+    }
+
+    if (!mounted) return;
+
+    setState(() => _faces = faces);
+  }
 }
 
 ///
@@ -333,113 +427,24 @@ class OcrTextWidget extends StatelessWidget {
 }
 
 ///
-/// BarcodeDetails
+/// FaceWidget
 ///
-class BarcodeDetails extends StatefulWidget {
-  final Barcode barcode;
+class FaceWidget extends StatelessWidget {
+  final Face face;
 
-  BarcodeDetails(this.barcode);
+  FaceWidget(this.face);
 
-  @override
-  _BarcodeDetailsState createState() => new _BarcodeDetailsState();
-}
-
-class _BarcodeDetailsState extends State<BarcodeDetails> {
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Barcode Details'),
-      ),
-      body: new ListView(
-        children: <Widget>[
-          new ListTile(
-            title: new Text(widget.barcode.displayValue),
-            subtitle: const Text('Display Value'),
-          ),
-          new ListTile(
-            title: new Text(widget.barcode.rawValue),
-            subtitle: const Text('Raw Value'),
-          ),
-          new ListTile(
-            title: new Text('${widget.barcode.getFormatString()} '
-                '(${widget.barcode.format})'),
-            subtitle: const Text('Format'),
-          ),
-          new ListTile(
-            title: new Text('${widget.barcode.getValueFormatString()} '
-                '(${widget.barcode.valueFormat})'),
-            subtitle: const Text('Value Format'),
-          ),
-          new ListTile(
-            title: new Text(widget.barcode.top.toString()),
-            subtitle: const Text('Top'),
-          ),
-          new ListTile(
-            title: new Text(widget.barcode.bottom.toString()),
-            subtitle: const Text('Bottom'),
-          ),
-          new ListTile(
-            title: new Text(widget.barcode.left.toString()),
-            subtitle: const Text('Left'),
-          ),
-          new ListTile(
-            title: new Text(widget.barcode.right.toString()),
-            subtitle: const Text('Right'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-///
-/// OcrTextDetail
-///
-class OcrTextDetails extends StatefulWidget {
-  final OcrText ocrText;
-
-  OcrTextDetails(this.ocrText);
-
-  @override
-  _OcrTextDetailsState createState() => new _OcrTextDetailsState();
-}
-
-class _OcrTextDetailsState extends State<OcrTextDetails> {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Barcode Details'),
-      ),
-      body: new ListView(
-        children: <Widget>[
-          new ListTile(
-            title: new Text(widget.ocrText.value),
-            subtitle: const Text('Value'),
-          ),
-          new ListTile(
-            title: new Text(widget.ocrText.language),
-            subtitle: const Text('Language'),
-          ),
-          new ListTile(
-            title: new Text(widget.ocrText.top.toString()),
-            subtitle: const Text('Top'),
-          ),
-          new ListTile(
-            title: new Text(widget.ocrText.bottom.toString()),
-            subtitle: const Text('Bottom'),
-          ),
-          new ListTile(
-            title: new Text(widget.ocrText.left.toString()),
-            subtitle: const Text('Left'),
-          ),
-          new ListTile(
-            title: new Text(widget.ocrText.right.toString()),
-            subtitle: const Text('Right'),
-          ),
-        ],
-      ),
+    return new ListTile(
+      leading: const Icon(Icons.face),
+      title: new Text(face.id.toString()),
+//      trailing: const Icon(Icons.arrow_forward),
+//      onTap: () => Navigator.of(context).push(
+//        new MaterialPageRoute(
+//          builder: (context) => new OcrTextDetails(ocrText),
+//        ),
+//      ),
     );
   }
 }

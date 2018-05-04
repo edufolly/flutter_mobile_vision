@@ -22,6 +22,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity;
+import io.github.edufolly.fluttermobilevision.face.FaceCaptureActivity;
+import io.github.edufolly.fluttermobilevision.face.MyFace;
 import io.github.edufolly.fluttermobilevision.ocr.MyTextBlock;
 import io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity;
 
@@ -34,6 +36,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private static final int RC_HANDLE_CAMERA_PERM = 2;
     private static final int RC_BARCODE_SCAN = 9010;
     private static final int RC_OCR_READ = 8020;
+    private static final int RC_FACE_DETECT = 7030;
 
     private final Activity activity;
     private Result result;
@@ -132,7 +135,24 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             } else {
                 ocrRead();
             }
+        } else if ("face".equals(call.method)) {
+            this.result = result;
 
+            if (arguments.containsKey("flash")) {
+                useFlash = (boolean) arguments.get("flash");
+            }
+
+            if (arguments.containsKey("autoFocus")) {
+                autoFocus = (boolean) arguments.get("autoFocus");
+            }
+
+            int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+            if (rc != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity, new
+                        String[]{Manifest.permission.CAMERA}, RC_HANDLE_CAMERA_PERM);
+            } else {
+                faceDetect();
+            }
         } else {
             result.notImplemented();
         }
@@ -156,6 +176,15 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(OcrCaptureActivity.MULTIPLE, multiple);
         intent.putExtra(OcrCaptureActivity.SHOW_TEXT, showText);
         activity.startActivityForResult(intent, RC_OCR_READ);
+    }
+
+    private void faceDetect() {
+        Intent intent = new Intent(activity, FaceCaptureActivity.class);
+        intent.putExtra(FaceCaptureActivity.AUTO_FOCUS, autoFocus);
+        intent.putExtra(FaceCaptureActivity.USE_FLASH, useFlash);
+        intent.putExtra(FaceCaptureActivity.MULTIPLE, multiple);
+        intent.putExtra(FaceCaptureActivity.SHOW_TEXT, showText);
+        activity.startActivityForResult(intent, RC_FACE_DETECT);
     }
 
     @Override
@@ -204,6 +233,25 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                     }
                 }
                 result.error("No text recognized, intent data is null", null, null);
+            } else if (resultCode == CommonStatusCodes.ERROR) {
+                Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
+                result.error(e.getMessage(), null, e);
+            }
+        } else if (requestCode == RC_FACE_DETECT) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (intent != null) {
+                    ArrayList<MyFace> faces = intent
+                            .getParcelableArrayListExtra(FaceCaptureActivity.FACE_OBJECT);
+                    if (!faces.isEmpty()) {
+                        List<Map<String, Object>> list = new ArrayList<>();
+                        for (MyFace face : faces) {
+                            list.add(face.getMap());
+                        }
+                        result.success(list);
+                        return true;
+                    }
+                }
+                result.error("No face detected, intent data is null", null, null);
             } else if (resultCode == CommonStatusCodes.ERROR) {
                 Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
                 result.error(e.getMessage(), null, e);

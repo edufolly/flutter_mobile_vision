@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.edufolly.fluttermobilevision.barcode;
+package io.github.edufolly.fluttermobilevision.face;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -35,8 +35,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,29 +46,24 @@ import io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview;
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
-public final class BarcodeCaptureActivity extends Activity
-        implements BarcodeUpdateListener {
-
+public final class FaceCaptureActivity extends Activity {
     public static final String AUTO_FOCUS = "AUTO_FOCUS";
     public static final String USE_FLASH = "USE_FLASH";
-    public static final String FORMATS = "FORMATS";
     public static final String MULTIPLE = "MULTIPLE";
-    public static final String WAIT_TAP = "WAIT_TAP";
     public static final String SHOW_TEXT = "SHOW_TEXT";
 
-    public static final String BARCODE_OBJECT = "Barcode";
+    public static final String FACE_OBJECT = "Face";
     public static final String ERROR = "Error";
 
     private CameraSource cameraSource;
     private CameraSourcePreview preview;
-    private GraphicOverlay<BarcodeGraphic> graphicOverlay;
+    private GraphicOverlay<FaceGraphic> graphicOverlay;
 
     private GestureDetector gestureDetector;
 
-    private boolean autoFocus;
     private boolean useFlash;
+    private boolean autoFocus;
     private boolean multiple;
-    private boolean waitTap;
     private boolean showText;
 
     @Override
@@ -86,10 +80,9 @@ public final class BarcodeCaptureActivity extends Activity
             preview = findViewById(R.id.preview);
             graphicOverlay = findViewById(R.id.graphic_overlay);
 
-            autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
+            autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             multiple = getIntent().getBooleanExtra(MULTIPLE, false);
-            waitTap = getIntent().getBooleanExtra(WAIT_TAP, false);
             showText = getIntent().getBooleanExtra(SHOW_TEXT, false);
 
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -105,6 +98,7 @@ public final class BarcodeCaptureActivity extends Activity
                     return onTap(e.getRawX(), e.getRawY()) || super.onSingleTapConfirmed(e);
                 }
             });
+
         } catch (Exception e) {
             onError(e);
         }
@@ -114,19 +108,19 @@ public final class BarcodeCaptureActivity extends Activity
     private void createCameraSource() throws MobileVisionException {
         Context context = getApplicationContext();
 
-        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context)
-                .setBarcodeFormats(getIntent().getIntExtra(FORMATS, Barcode.ALL_FORMATS))
+        // TODO: Verify attributes.
+        FaceDetector faceDetector = new FaceDetector.Builder(context)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
-        BarcodeTrackerFactory barcodeTrackerFactory = new BarcodeTrackerFactory(graphicOverlay,
-                this, showText);
+        FaceTrackerFactory faceTrackerFactory = new FaceTrackerFactory(graphicOverlay);
 
-        barcodeDetector.setProcessor(
-                new MultiProcessor.Builder<>(barcodeTrackerFactory).build());
+        faceDetector.setProcessor(
+                new MultiProcessor.Builder<>(faceTrackerFactory).build());
 
-        if (!barcodeDetector.isOperational()) {
-            IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
-            boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
+        if (!faceDetector.isOperational()) {
+            IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
 
             if (hasLowStorage) {
                 throw new MobileVisionException("Low Storage.");
@@ -137,7 +131,7 @@ public final class BarcodeCaptureActivity extends Activity
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
         cameraSource = new CameraSource
-                .Builder(getApplicationContext(), barcodeDetector)
+                .Builder(getApplicationContext(), faceDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
@@ -206,45 +200,29 @@ public final class BarcodeCaptureActivity extends Activity
                 || super.onTouchEvent(e);
     }
 
-    private boolean onTap(float rawX, float rawY) {
-        if (!waitTap) {
-            return false;
-        }
 
-        ArrayList<Barcode> list = new ArrayList<>();
+    private boolean onTap(float rawX, float rawY) {
+        ArrayList<MyFace> list = new ArrayList<>();
 
         if (multiple) {
-            for (BarcodeGraphic graphic : graphicOverlay.getGraphics()) {
-                list.add(graphic.getBarcode());
+            for (FaceGraphic graphic : graphicOverlay.getGraphics()) {
+                list.add(new MyFace(graphic.getFace()));
             }
         } else {
-            BarcodeGraphic graphic = graphicOverlay.getBest(rawX, rawY);
-            if (graphic != null && graphic.getBarcode() != null) {
-                list.add(graphic.getBarcode());
+            FaceGraphic graphic = graphicOverlay.getBest(rawX, rawY);
+            if (graphic != null && graphic.getFace() != null) {
+                list.add(new MyFace(graphic.getFace()));
             }
         }
 
         if (!list.isEmpty()) {
-            success(list);
+            Intent data = new Intent();
+            data.putExtra(FACE_OBJECT, list);
+            setResult(CommonStatusCodes.SUCCESS, data);
+            finish();
             return true;
         }
 
         return false;
-    }
-
-    @Override
-    public void onBarcodeDetected(final Barcode barcode) {
-        if (!waitTap) {
-            ArrayList<Barcode> list = new ArrayList<>(1);
-            list.add(barcode);
-            success(list);
-        }
-    }
-
-    private void success(ArrayList<Barcode> list) {
-        Intent data = new Intent();
-        data.putExtra(BARCODE_OBJECT, list);
-        setResult(CommonStatusCodes.SUCCESS, data);
-        finish();
     }
 }

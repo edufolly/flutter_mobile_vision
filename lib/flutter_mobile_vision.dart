@@ -54,6 +54,27 @@ class FlutterMobileVision {
 
     return list.map((map) => OcrText.fromMap(map)).toList();
   }
+
+  ///
+  ///
+  ///
+  static Future<List<Face>> face({
+    bool flash: false,
+    bool autoFocus: true,
+    bool multiple: true,
+    bool showText: true,
+  }) async {
+    Map<String, dynamic> arguments = {
+      'flash': flash,
+      'autoFocus': autoFocus,
+      'multiple': multiple,
+      'showText': showText,
+    };
+
+    final List list = await _channel.invokeMethod('face', arguments);
+
+    return list.map((map) => Face.fromMap(map)).toList();
+  }
 }
 
 ///
@@ -204,6 +225,62 @@ class OcrText {
     return {
       'value': value,
       'language': language,
+      'top': top,
+      'bottom': bottom,
+      'left': left,
+      'right': right,
+    };
+  }
+}
+
+///
+///
+///
+class Face {
+  final int id;
+  final double eulerY;
+  final double eulerZ;
+  final double leftEyeOpenProbability;
+  final double rightEyeOpenProbability;
+  final double smilingProbability;
+  final int top;
+  final int bottom;
+  final int left;
+  final int right;
+
+  Face(
+    this.id, {
+    this.eulerY: -1.0,
+    this.eulerZ: -1.0,
+    this.leftEyeOpenProbability: -1.0,
+    this.rightEyeOpenProbability: -1.0,
+    this.smilingProbability: -1.0,
+    this.top: -1,
+    this.bottom: -1,
+    this.left: -1,
+    this.right: -1,
+  });
+
+  Face.fromMap(Map map)
+      : id = map['id'],
+        eulerY = map['eulerY'],
+        eulerZ = map['eulerZ'],
+        leftEyeOpenProbability = map['leftEyeOpenProbability'],
+        rightEyeOpenProbability = map['rightEyeOpenProbability'],
+        smilingProbability = map['smilingProbability'],
+        top = map['top'],
+        bottom = map['bottom'],
+        left = map['left'],
+        right = map['right'];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'eulerY': eulerY,
+      'eulerZ': eulerZ,
+      'leftEyeOpenProbability': leftEyeOpenProbability,
+      'rightEyeOpenProbability': rightEyeOpenProbability,
+      'smilingProbability': smilingProbability,
       'top': top,
       'bottom': bottom,
       'left': left,

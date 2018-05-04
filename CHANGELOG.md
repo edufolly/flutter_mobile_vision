@@ -1,3 +1,8 @@
+## [0.0.4] - 2018-05-04
+
+* Face Detection.
+
+
 ## [0.0.3] - 2018-05-02
 
 * Text Recognition.

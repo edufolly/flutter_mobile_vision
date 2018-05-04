@@ -25,12 +25,19 @@ Liked? :star: Star the repo to support the project!
       * [x] Show barcode text.
    * [x] Recognize Text
       * [x] Simple OCR.
+      * [x] Toggle torch.
+      * [x] Toggle auto focus.
       * [x] Multiple recognition.
       * [x] Text language.
       * [x] Text coordinates.
       * [x] Hide recognized text.
    * [ ] Detect Faces
-      * [ ] _Future Tasks_
+      * [x] Simple detection.
+      * [x] Toggle torch.
+      * [x] Toggle auto focus.
+      * [x] Multiple detection.
+      * [ ] Face coordinates.
+      * [ ] Hide detection information.
 
 * [ ] iOS
    * [ ] Barcode Scan
@@ -131,6 +138,44 @@ For Android, you must do the following before you can use the plugin:
 * Add the OCR activity to your AndroidManifest.xml
 
    `<activity android:name="io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity" />`
+
+### iOS
+
+If you can help, the community thanks. Your fork is needed. :wink:
+
+------
+
+## Face Detection
+
+```dart
+//...
+List<Face> faces = [];
+try {
+  faces = await FlutterMobileVision.face(
+    flash: _torchFace,
+    autoFocus: _autoFocusFace,
+    multiple: _multipleFace,
+    showText: _showTextFace,
+  );
+} on Exception catch (e) {
+  faces.add(new Face(-1));
+}
+//...
+```
+
+### Android
+
+For Android, you must do the following before you can use the plugin:
+
+* Add the camera permission to your AndroidManifest.xml
+
+    `<uses-feature android:name="android.hardware.camera" />`
+
+    `<uses-permission android:name="android.permission.CAMERA" />`
+
+* Add the Face Detection activity to your AndroidManifest.xml
+
+   `<activity android:name="io.github.edufolly.fluttermobilevision.face.FaceCaptureActivity" />`
 
 ### iOS
 
