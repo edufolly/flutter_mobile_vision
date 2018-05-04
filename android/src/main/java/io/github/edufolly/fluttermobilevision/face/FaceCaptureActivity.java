@@ -113,7 +113,7 @@ public final class FaceCaptureActivity extends Activity {
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
-        FaceTrackerFactory faceTrackerFactory = new FaceTrackerFactory(graphicOverlay);
+        FaceTrackerFactory faceTrackerFactory = new FaceTrackerFactory(graphicOverlay, showText);
 
         faceDetector.setProcessor(
                 new MultiProcessor.Builder<>(faceTrackerFactory).build());

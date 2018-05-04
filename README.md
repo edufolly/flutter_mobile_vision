@@ -23,6 +23,7 @@ Liked? :star: Star the repo to support the project!
       * [x] Scan multiple barcodes.
       * [x] Barcode coordinates.
       * [x] Show barcode text.
+      * [ ] Standard code.
    * [x] Recognize Text
       * [x] Simple OCR.
       * [x] Toggle torch.
@@ -31,13 +32,18 @@ Liked? :star: Star the repo to support the project!
       * [x] Text language.
       * [x] Text coordinates.
       * [x] Hide recognized text.
+      * [ ] Standard code.
    * [ ] Detect Faces
       * [x] Simple detection.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
       * [x] Multiple detection.
-      * [ ] Face coordinates.
-      * [ ] Hide detection information.
+      * [x] Face coordinates.
+      * [x] Hide detection information.
+      * [ ] Standard code.
+   * [ ] Generalization of capture activities.
+   * [ ] Choose between back and front camera.
+   * [ ] Control camera FPS.
 
 * [ ] iOS
    * [ ] Barcode Scan
@@ -47,8 +53,10 @@ Liked? :star: Star the repo to support the project!
    * [ ] Detect Faces
       * [ ] _Future Tasks_
 
+### Your feature isn't listed? Open a issue right now!
+
 ## Screenshots
-<img src="docs/flutter_01.png" height="300em"/> <img src="docs/flutter_02.png" height="300em"/> <img src="docs/flutter_03.png" height="300em"/> <img src="docs/flutter_04.png" height="300em"/> <img src="docs/flutter_06.png" height="300em"/>
+<img src="docs/flutter_01.png" height="300em"/> <img src="docs/flutter_02.png" height="300em"/> <img src="docs/flutter_03.png" height="300em"/> <img src="docs/flutter_04.png" height="300em"/> <img src="docs/flutter_05.png" height="300em"/> <img src="docs/flutter_06.png" height="300em"/> <img src="docs/flutter_07.png" height="300em"/> <img src="docs/flutter_08.png" height="300em"/>
 
 ## Usage
 
@@ -62,7 +70,7 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision: ^0.0.3
+    flutter_mobile_vision: ^0.0.4
 ```
 
 -----

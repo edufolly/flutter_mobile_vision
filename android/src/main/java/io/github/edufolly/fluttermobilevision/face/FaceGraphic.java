@@ -44,16 +44,23 @@ class FaceGraphic extends GraphicOverlay.Graphic {
             Color.WHITE,
             Color.YELLOW
     };
-    private static int currentColorIndex = 0;
+    private static int currentColorIndex;
+
+    static {
+        currentColorIndex = 0;
+    }
 
     private Paint facePositionPaint;
     private Paint idPaint;
     private Paint boxPaint;
 
+    private boolean showText;
     private volatile Face face;
 
-    FaceGraphic(GraphicOverlay overlay) {
+    FaceGraphic(GraphicOverlay overlay, boolean showText) {
         super(overlay);
+
+        this.showText = showText;
 
         currentColorIndex = (currentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[currentColorIndex];
@@ -113,18 +120,20 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
         float y = translateY(face.getPosition().y + face.getHeight() / 2);
 
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
+        if (showText) {
+            canvas.drawCircle(x, y, FACE_POSITION_RADIUS, facePositionPaint);
 
-        canvas.drawText("id: " + getId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
+            canvas.drawText("id: " + getId(), x + ID_X_OFFSET, y + ID_Y_OFFSET, idPaint);
 
-        canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()),
-                x - ID_X_OFFSET, y - ID_Y_OFFSET, idPaint);
+            canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()),
+                    x - ID_X_OFFSET, y - ID_Y_OFFSET, idPaint);
 
-        canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()),
-                x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, idPaint);
+            canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()),
+                    x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, idPaint);
 
-        canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()),
-                x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, idPaint);
+            canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()),
+                    x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, idPaint);
+        }
 
         // Draws a bounding box around the face.
         canvas.drawRect(getBoundingBox(), boxPaint);

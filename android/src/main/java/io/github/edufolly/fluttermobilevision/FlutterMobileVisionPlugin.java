@@ -146,6 +146,14 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 autoFocus = (boolean) arguments.get("autoFocus");
             }
 
+            if (arguments.containsKey("multiple")) {
+                multiple = (boolean) arguments.get("multiple");
+            }
+
+            if (arguments.containsKey("showText")) {
+                showText = (boolean) arguments.get("showText");
+            }
+
             int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
             if (rc != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(activity, new

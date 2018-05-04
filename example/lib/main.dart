@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:flutter_mobile_vision_example/barcode_details.dart';
+import 'package:flutter_mobile_vision_example/face_details.dart';
 import 'package:flutter_mobile_vision_example/ocr_text_details.dart';
 
 void main() => runApp(new MyApp());
@@ -439,12 +440,12 @@ class FaceWidget extends StatelessWidget {
     return new ListTile(
       leading: const Icon(Icons.face),
       title: new Text(face.id.toString()),
-//      trailing: const Icon(Icons.arrow_forward),
-//      onTap: () => Navigator.of(context).push(
-//        new MaterialPageRoute(
-//          builder: (context) => new OcrTextDetails(ocrText),
-//        ),
-//      ),
+      trailing: const Icon(Icons.arrow_forward),
+      onTap: () => Navigator.of(context).push(
+            new MaterialPageRoute(
+              builder: (context) => new FaceDetails(face),
+            ),
+          ),
     );
   }
 }
