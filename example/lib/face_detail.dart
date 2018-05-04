@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 
-class FaceDetails extends StatefulWidget {
+class FaceDetail extends StatefulWidget {
   final Face face;
 
-  FaceDetails(this.face);
+  FaceDetail(this.face);
 
   @override
-  _FaceDetailsState createState() => new _FaceDetailsState();
+  _FaceDetailState createState() => new _FaceDetailState();
 }
 
-class _FaceDetailsState extends State<FaceDetails> {
+class _FaceDetailState extends State<FaceDetail> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(

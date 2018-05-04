@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
-import 'package:flutter_mobile_vision_example/barcode_details.dart';
-import 'package:flutter_mobile_vision_example/face_details.dart';
-import 'package:flutter_mobile_vision_example/ocr_text_details.dart';
+import 'package:flutter_mobile_vision_example/barcode_detail.dart';
+import 'package:flutter_mobile_vision_example/face_detail.dart';
+import 'package:flutter_mobile_vision_example/ocr_text_detail.dart';
 
 void main() => runApp(new MyApp());
 
@@ -396,7 +396,7 @@ class BarcodeWidget extends StatelessWidget {
       trailing: const Icon(Icons.arrow_forward),
       onTap: () => Navigator.of(context).push(
             new MaterialPageRoute(
-              builder: (context) => new BarcodeDetails(barcode),
+              builder: (context) => new BarcodeDetail(barcode),
             ),
           ),
     );
@@ -420,7 +420,7 @@ class OcrTextWidget extends StatelessWidget {
       trailing: const Icon(Icons.arrow_forward),
       onTap: () => Navigator.of(context).push(
             new MaterialPageRoute(
-              builder: (context) => new OcrTextDetails(ocrText),
+              builder: (context) => new OcrTextDetail(ocrText),
             ),
           ),
     );
@@ -443,7 +443,7 @@ class FaceWidget extends StatelessWidget {
       trailing: const Icon(Icons.arrow_forward),
       onTap: () => Navigator.of(context).push(
             new MaterialPageRoute(
-              builder: (context) => new FaceDetails(face),
+              builder: (context) => new FaceDetail(face),
             ),
           ),
     );

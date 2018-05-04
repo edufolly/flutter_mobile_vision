@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 
-class OcrTextDetails extends StatefulWidget {
+class OcrTextDetail extends StatefulWidget {
   final OcrText ocrText;
 
-  OcrTextDetails(this.ocrText);
+  OcrTextDetail(this.ocrText);
 
   @override
-  _OcrTextDetailsState createState() => new _OcrTextDetailsState();
+  _OcrTextDetailState createState() => new _OcrTextDetailState();
 }
 
-class _OcrTextDetailsState extends State<OcrTextDetails> {
+class _OcrTextDetailState extends State<OcrTextDetail> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(

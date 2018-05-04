@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 
-class BarcodeDetails extends StatefulWidget {
+class BarcodeDetail extends StatefulWidget {
   final Barcode barcode;
 
-  BarcodeDetails(this.barcode);
+  BarcodeDetail(this.barcode);
 
   @override
-  _BarcodeDetailsState createState() => new _BarcodeDetailsState();
+  _BarcodeDetailState createState() => new _BarcodeDetailState();
 }
 
-class _BarcodeDetailsState extends State<BarcodeDetails> {
+class _BarcodeDetailState extends State<BarcodeDetail> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
