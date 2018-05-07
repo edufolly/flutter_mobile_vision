@@ -1,3 +1,8 @@
+## [0.1.0] - 2018-05-06
+
+* Production mode on.
+
+
 ## [0.0.4] - 2018-05-04
 
 * Face Detection.

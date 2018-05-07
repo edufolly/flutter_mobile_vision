@@ -6,6 +6,9 @@ class FlutterMobileVision {
   static const MethodChannel _channel =
       const MethodChannel('flutter_mobile_vision');
 
+  static const int CAMERA_BACK = 0;
+  static const int CAMERA_FRONT = 1;
+
   ///
   ///
   ///
@@ -16,6 +19,8 @@ class FlutterMobileVision {
     bool multiple: false,
     bool waitTap: false,
     bool showText: false,
+    int camera: CAMERA_BACK,
+    double fps: 15.0,
   }) async {
     if (multiple) {
       waitTap = true;
@@ -27,6 +32,8 @@ class FlutterMobileVision {
       'multiple': multiple,
       'waitTap': waitTap,
       'showText': showText,
+      'camera': camera,
+      'fps': fps,
     };
 
     final List list = await _channel.invokeMethod('scan', arguments);
@@ -42,12 +49,16 @@ class FlutterMobileVision {
     bool autoFocus: true,
     bool multiple: false,
     bool showText: true,
+    int camera: CAMERA_BACK,
+    double fps: 2.0,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
       'autoFocus': autoFocus,
       'multiple': multiple,
       'showText': showText,
+      'camera': camera,
+      'fps': fps,
     };
 
     final List list = await _channel.invokeMethod('read', arguments);
@@ -63,12 +74,16 @@ class FlutterMobileVision {
     bool autoFocus: true,
     bool multiple: true,
     bool showText: true,
+    int camera: CAMERA_BACK,
+    double fps: 15.0,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
       'autoFocus': autoFocus,
       'multiple': multiple,
       'showText': showText,
+      'camera': camera,
+      'fps': fps,
     };
 
     final List list = await _channel.invokeMethod('face', arguments);

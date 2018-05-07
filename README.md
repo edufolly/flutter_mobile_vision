@@ -12,7 +12,7 @@ Liked? :star: Star the repo to support the project!
 
 ## Features
 
-* [ ] Android
+* [x] Android
    * [x] Barcode Scan
       * [x] Simple scan.
       * [x] Toggle torch.
@@ -42,8 +42,8 @@ Liked? :star: Star the repo to support the project!
       * [x] Hide detection information.
       * [x] Standard code.
    * [x] Generalization of capture activities.
-   * [ ] Choose between back and front camera.
-   * [ ] Control camera FPS.
+   * [x] Choose between back and front camera.
+   * [x] Control camera FPS.
 
 * [ ] iOS
    * [ ] Barcode Scan
@@ -70,7 +70,7 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision: ^0.0.4
+    flutter_mobile_vision: ^0.1.0
 ```
 
 -----
@@ -88,6 +88,8 @@ try {
     multiple: _multipleBarcode,
     waitTap: _waitTapBarcode,
     showText: _showTextBarcode,
+    camera: _cameraBarcode,
+    fps: 15.0,
   );
 } on Exception {
   barcodes.add(new Barcode('Failed to get barcode.'));
@@ -126,6 +128,8 @@ try {
     autoFocus: _autoFocusOcr,
     multiple: _multipleOcr,
     showText: _showTextOcr,
+    camera: _cameraOcr,
+    fps: 2.0,
   );
 } on Exception {
   texts.add(new OcrText('Failed to recognize text.'));
@@ -164,8 +168,10 @@ try {
     autoFocus: _autoFocusFace,
     multiple: _multipleFace,
     showText: _showTextFace,
+    camera: _cameraFace,
+    fps: 15.0,
   );
-} on Exception catch (e) {
+} on Exception {
   faces.add(new Face(-1));
 }
 //...

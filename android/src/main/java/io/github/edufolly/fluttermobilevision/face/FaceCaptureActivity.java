@@ -48,11 +48,11 @@ public final class FaceCaptureActivity extends AbstractCaptureActivity<FaceGraph
 
         cameraSource = new CameraSource
                 .Builder(getApplicationContext(), faceDetector)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setFacing(camera)
                 .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
-                .setRequestedFps(15.0f)
+                .setRequestedFps(fps)
                 .build();
     }
 

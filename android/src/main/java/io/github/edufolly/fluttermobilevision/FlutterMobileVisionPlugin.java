@@ -26,6 +26,8 @@ import io.github.edufolly.fluttermobilevision.face.FaceCaptureActivity;
 import io.github.edufolly.fluttermobilevision.face.MyFace;
 import io.github.edufolly.fluttermobilevision.ocr.MyTextBlock;
 import io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity;
+import io.github.edufolly.fluttermobilevision.ui.CameraSource;
+import io.github.edufolly.fluttermobilevision.util.AbstractCaptureActivity;
 
 /**
  * FlutterMobileVisionPlugin
@@ -47,6 +49,8 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private boolean multiple = false;
     private boolean waitTap = false;
     private boolean showText = false;
+    private int camera = CameraSource.CAMERA_FACING_BACK;
+    private float fps = 15.0f;
 
     /**
      * Plugin registration.
@@ -101,6 +105,15 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             showText = (boolean) arguments.get("showText");
         }
 
+        if (arguments.containsKey("camera")) {
+            camera = (int) arguments.get("camera");
+        }
+
+        if (arguments.containsKey("fps")) {
+            double tfps = (double) arguments.get("fps");
+            fps = (float) tfps;
+        }
+
         int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
         if (rc != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(activity, new
@@ -112,44 +125,32 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             }
         }
 
+        Intent intent;
+        int res;
+
         if ("scan".equals(call.method)) {
-            scanBarcode();
+            intent = new Intent(activity, BarcodeCaptureActivity.class);
+            res = RC_BARCODE_SCAN;
         } else if ("read".equals(call.method)) {
-            ocrRead();
+            intent = new Intent(activity, OcrCaptureActivity.class);
+            res = RC_OCR_READ;
         } else if ("face".equals(call.method)) {
-            faceDetect();
+            intent = new Intent(activity, FaceCaptureActivity.class);
+            res = RC_FACE_DETECT;
         } else {
             result.notImplemented();
+            return;
         }
-    }
 
-    private void scanBarcode() {
-        Intent intent = new Intent(activity, BarcodeCaptureActivity.class);
-        intent.putExtra(BarcodeCaptureActivity.AUTO_FOCUS, autoFocus);
-        intent.putExtra(BarcodeCaptureActivity.USE_FLASH, useFlash);
-        intent.putExtra(BarcodeCaptureActivity.FORMATS, formats);
-        intent.putExtra(BarcodeCaptureActivity.MULTIPLE, multiple);
-        intent.putExtra(BarcodeCaptureActivity.WAIT_TAP, waitTap);
-        intent.putExtra(BarcodeCaptureActivity.SHOW_TEXT, showText);
-        activity.startActivityForResult(intent, RC_BARCODE_SCAN);
-    }
-
-    private void ocrRead() {
-        Intent intent = new Intent(activity, OcrCaptureActivity.class);
-        intent.putExtra(OcrCaptureActivity.AUTO_FOCUS, autoFocus);
-        intent.putExtra(OcrCaptureActivity.USE_FLASH, useFlash);
-        intent.putExtra(OcrCaptureActivity.MULTIPLE, multiple);
-        intent.putExtra(OcrCaptureActivity.SHOW_TEXT, showText);
-        activity.startActivityForResult(intent, RC_OCR_READ);
-    }
-
-    private void faceDetect() {
-        Intent intent = new Intent(activity, FaceCaptureActivity.class);
-        intent.putExtra(FaceCaptureActivity.AUTO_FOCUS, autoFocus);
-        intent.putExtra(FaceCaptureActivity.USE_FLASH, useFlash);
-        intent.putExtra(FaceCaptureActivity.MULTIPLE, multiple);
-        intent.putExtra(FaceCaptureActivity.SHOW_TEXT, showText);
-        activity.startActivityForResult(intent, RC_FACE_DETECT);
+        intent.putExtra(AbstractCaptureActivity.AUTO_FOCUS, autoFocus);
+        intent.putExtra(AbstractCaptureActivity.USE_FLASH, useFlash);
+        intent.putExtra(AbstractCaptureActivity.FORMATS, formats);
+        intent.putExtra(AbstractCaptureActivity.MULTIPLE, multiple);
+        intent.putExtra(AbstractCaptureActivity.WAIT_TAP, waitTap);
+        intent.putExtra(AbstractCaptureActivity.SHOW_TEXT, showText);
+        intent.putExtra(AbstractCaptureActivity.CAMERA, camera);
+        intent.putExtra(AbstractCaptureActivity.FPS, fps);
+        activity.startActivityForResult(intent, res);
     }
 
     @Override

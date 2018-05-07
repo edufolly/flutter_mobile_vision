@@ -32,6 +32,8 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
     public static final String MULTIPLE = "MULTIPLE";
     public static final String WAIT_TAP = "WAIT_TAP";
     public static final String SHOW_TEXT = "SHOW_TEXT";
+    public static final String CAMERA = "CAMERA";
+    public static final String FPS = "FPS";
 
     public static final String OBJECT = "Object";
     public static final String ERROR = "Error";
@@ -47,6 +49,8 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
     protected boolean multiple;
     protected boolean waitTap;
     protected boolean showText;
+    protected int camera;
+    protected float fps;
 
     @Override
     protected void onCreate(Bundle icicle) {
@@ -67,6 +71,8 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
             multiple = getIntent().getBooleanExtra(MULTIPLE, false);
             waitTap = getIntent().getBooleanExtra(WAIT_TAP, false);
             showText = getIntent().getBooleanExtra(SHOW_TEXT, false);
+            camera = getIntent().getIntExtra(CAMERA, CameraSource.CAMERA_FACING_BACK);
+            fps = getIntent().getFloatExtra(FPS, 15.0f);
 
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {

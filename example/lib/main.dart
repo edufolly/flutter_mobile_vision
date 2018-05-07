@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  int _cameraBarcode = FlutterMobileVision.CAMERA_BACK;
   int _onlyFormatBarcode = Barcode.ALL_FORMATS;
   bool _autoFocusBarcode = true;
   bool _torchBarcode = false;
@@ -22,12 +23,14 @@ class _MyAppState extends State<MyApp> {
   bool _showTextBarcode = false;
   List<Barcode> _barcodes = [];
 
+  int _cameraOcr = FlutterMobileVision.CAMERA_BACK;
   bool _autoFocusOcr = true;
   bool _torchOcr = false;
   bool _multipleOcr = false;
   bool _showTextOcr = true;
   List<OcrText> _textsOcr = [];
 
+  int _cameraFace = FlutterMobileVision.CAMERA_FRONT;
   bool _autoFocusFace = true;
   bool _torchFace = false;
   bool _multipleFace = true;
@@ -87,10 +90,52 @@ class _MyAppState extends State<MyApp> {
   }
 
   ///
+  /// Camera list
+  ///
+  List<DropdownMenuItem<int>> _getCameras() {
+    List<DropdownMenuItem<int>> formatItems = [];
+
+    formatItems.add(new DropdownMenuItem(
+      child: new Text('BACK'),
+      value: FlutterMobileVision.CAMERA_BACK,
+    ));
+
+    formatItems.add(new DropdownMenuItem(
+      child: new Text('FRONT'),
+      value: FlutterMobileVision.CAMERA_FRONT,
+    ));
+
+    return formatItems;
+  }
+
+  ///
   /// Scan Screen
   ///
   Widget _getScanScreen(BuildContext context) {
     List<Widget> items = [];
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: const Text('Camera:'),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: new DropdownButton(
+        items: _getCameras(),
+        onChanged: (value) => setState(
+              () => _cameraBarcode = value,
+            ),
+        value: _cameraBarcode,
+      ),
+    ));
 
     items.add(new Padding(
       padding: const EdgeInsets.only(
@@ -197,6 +242,8 @@ class _MyAppState extends State<MyApp> {
         multiple: _multipleBarcode,
         waitTap: _waitTapBarcode,
         showText: _showTextBarcode,
+        camera: _cameraBarcode,
+        fps: 15.0,
       );
     } on Exception {
       barcodes.add(new Barcode('Failed to get barcode.'));
@@ -212,6 +259,29 @@ class _MyAppState extends State<MyApp> {
   ///
   Widget _getOcrScreen(BuildContext context) {
     List<Widget> items = [];
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: const Text('Camera:'),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: new DropdownButton(
+        items: _getCameras(),
+        onChanged: (value) => setState(
+              () => _cameraOcr = value,
+            ),
+        value: _cameraOcr,
+      ),
+    ));
 
     items.add(new SwitchListTile(
       title: const Text('Auto focus:'),
@@ -281,6 +351,8 @@ class _MyAppState extends State<MyApp> {
         autoFocus: _autoFocusOcr,
         multiple: _multipleOcr,
         showText: _showTextOcr,
+        camera: _cameraOcr,
+        fps: 2.0,
       );
     } on Exception {
       texts.add(new OcrText('Failed to recognize text.'));
@@ -296,6 +368,29 @@ class _MyAppState extends State<MyApp> {
   ///
   Widget _getFaceScreen(BuildContext context) {
     List<Widget> items = [];
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: const Text('Camera:'),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: new DropdownButton(
+        items: _getCameras(),
+        onChanged: (value) => setState(
+              () => _cameraFace = value,
+            ),
+        value: _cameraFace,
+      ),
+    ));
 
     items.add(new SwitchListTile(
       title: const Text('Auto focus:'),
@@ -365,8 +460,10 @@ class _MyAppState extends State<MyApp> {
         autoFocus: _autoFocusFace,
         multiple: _multipleFace,
         showText: _showTextFace,
+        camera: _cameraFace,
+        fps: 15.0,
       );
-    } on Exception catch (e) {
+    } on Exception {
       faces.add(new Face(-1));
     }
 
