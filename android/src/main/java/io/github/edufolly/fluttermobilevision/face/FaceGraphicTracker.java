@@ -18,7 +18,7 @@ class FaceGraphicTracker extends Tracker<Face> {
     }
 
     @Override
-    public void onNewItem(int id, Face item) {
+    public void onNewItem(int id, Face face) {
         graphic.setId(id);
     }
 

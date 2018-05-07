@@ -23,7 +23,7 @@ Liked? :star: Star the repo to support the project!
       * [x] Scan multiple barcodes.
       * [x] Barcode coordinates.
       * [x] Show barcode text.
-      * [ ] Standard code.
+      * [x] Standard code.
    * [x] Recognize Text
       * [x] Simple OCR.
       * [x] Toggle torch.
@@ -32,16 +32,16 @@ Liked? :star: Star the repo to support the project!
       * [x] Text language.
       * [x] Text coordinates.
       * [x] Hide recognized text.
-      * [ ] Standard code.
-   * [ ] Detect Faces
+      * [x] Standard code.
+   * [x] Detect Faces
       * [x] Simple detection.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
       * [x] Multiple detection.
       * [x] Face coordinates.
       * [x] Hide detection information.
-      * [ ] Standard code.
-   * [ ] Generalization of capture activities.
+      * [x] Standard code.
+   * [x] Generalization of capture activities.
    * [ ] Choose between back and front camera.
    * [ ] Control camera FPS.
 

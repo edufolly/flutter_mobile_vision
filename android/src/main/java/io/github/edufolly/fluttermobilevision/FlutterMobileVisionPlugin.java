@@ -71,96 +71,53 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
         final Map<String, Object> arguments = call.arguments();
 
+        this.result = result;
+
+        if (arguments.containsKey("flash")) {
+            useFlash = (boolean) arguments.get("flash");
+        }
+
+        if (arguments.containsKey("autoFocus")) {
+            autoFocus = (boolean) arguments.get("autoFocus");
+        }
+
+        if (arguments.containsKey("formats")) {
+            formats = (int) arguments.get("formats");
+        }
+
+        if (arguments.containsKey("multiple")) {
+            multiple = (boolean) arguments.get("multiple");
+        }
+
+        if (arguments.containsKey("waitTap")) {
+            waitTap = (boolean) arguments.get("waitTap");
+        }
+
+        if (multiple) {
+            waitTap = true;
+        }
+
+        if (arguments.containsKey("showText")) {
+            showText = (boolean) arguments.get("showText");
+        }
+
+        int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+        if (rc != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new
+                    String[]{Manifest.permission.CAMERA}, RC_HANDLE_CAMERA_PERM);
+
+            rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
+            if (rc != PackageManager.PERMISSION_GRANTED) {
+                result.error("No camera permission.", null, null);
+            }
+        }
+
         if ("scan".equals(call.method)) {
-            this.result = result;
-
-            if (arguments.containsKey("flash")) {
-                useFlash = (boolean) arguments.get("flash");
-            }
-
-            if (arguments.containsKey("autoFocus")) {
-                autoFocus = (boolean) arguments.get("autoFocus");
-            }
-
-            if (arguments.containsKey("formats")) {
-                formats = (int) arguments.get("formats");
-            }
-
-            if (arguments.containsKey("multiple")) {
-                multiple = (boolean) arguments.get("multiple");
-            }
-
-            if (arguments.containsKey("waitTap")) {
-                waitTap = (boolean) arguments.get("waitTap");
-            }
-
-            if (multiple) {
-                waitTap = true;
-            }
-
-            if (arguments.containsKey("showText")) {
-                showText = (boolean) arguments.get("showText");
-            }
-
-            int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-            if (rc != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, new
-                        String[]{Manifest.permission.CAMERA}, RC_HANDLE_CAMERA_PERM);
-            } else {
-                scanBarcode();
-            }
+            scanBarcode();
         } else if ("read".equals(call.method)) {
-            this.result = result;
-
-            if (arguments.containsKey("flash")) {
-                useFlash = (boolean) arguments.get("flash");
-            }
-
-            if (arguments.containsKey("autoFocus")) {
-                autoFocus = (boolean) arguments.get("autoFocus");
-            }
-
-            if (arguments.containsKey("multiple")) {
-                multiple = (boolean) arguments.get("multiple");
-            }
-
-            if (arguments.containsKey("showText")) {
-                showText = (boolean) arguments.get("showText");
-            }
-
-            int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-            if (rc != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, new
-                        String[]{Manifest.permission.CAMERA}, RC_HANDLE_CAMERA_PERM);
-            } else {
-                ocrRead();
-            }
+            ocrRead();
         } else if ("face".equals(call.method)) {
-            this.result = result;
-
-            if (arguments.containsKey("flash")) {
-                useFlash = (boolean) arguments.get("flash");
-            }
-
-            if (arguments.containsKey("autoFocus")) {
-                autoFocus = (boolean) arguments.get("autoFocus");
-            }
-
-            if (arguments.containsKey("multiple")) {
-                multiple = (boolean) arguments.get("multiple");
-            }
-
-            if (arguments.containsKey("showText")) {
-                showText = (boolean) arguments.get("showText");
-            }
-
-            int rc = ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA);
-            if (rc != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activity, new
-                        String[]{Manifest.permission.CAMERA}, RC_HANDLE_CAMERA_PERM);
-            } else {
-                faceDetect();
-            }
+            faceDetect();
         } else {
             result.notImplemented();
         }
@@ -201,7 +158,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (intent != null) {
                     ArrayList<Barcode> barcodes = intent
-                            .getParcelableArrayListExtra(BarcodeCaptureActivity.BARCODE_OBJECT);
+                            .getParcelableArrayListExtra(BarcodeCaptureActivity.OBJECT);
                     if (!barcodes.isEmpty()) {
                         List<Map<String, Object>> list = new ArrayList<>();
                         for (Barcode barcode : barcodes) {
@@ -230,7 +187,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (intent != null) {
                     ArrayList<MyTextBlock> blocks = intent
-                            .getParcelableArrayListExtra(OcrCaptureActivity.TEXT_OBJECT);
+                            .getParcelableArrayListExtra(OcrCaptureActivity.OBJECT);
                     if (!blocks.isEmpty()) {
                         List<Map<String, Object>> list = new ArrayList<>();
                         for (MyTextBlock block : blocks) {
@@ -249,7 +206,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             if (resultCode == CommonStatusCodes.SUCCESS) {
                 if (intent != null) {
                     ArrayList<MyFace> faces = intent
-                            .getParcelableArrayListExtra(FaceCaptureActivity.FACE_OBJECT);
+                            .getParcelableArrayListExtra(FaceCaptureActivity.OBJECT);
                     if (!faces.isEmpty()) {
                         List<Map<String, Object>> list = new ArrayList<>();
                         for (MyFace face : faces) {
@@ -278,8 +235,6 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         }
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // FIXME: Please!
-            // scanBarcode();
             return true;
         }
 

@@ -36,17 +36,17 @@ public class BarcodeGraphicTracker extends Tracker<Barcode> {
     }
 
     @Override
-    public void onNewItem(int id, Barcode item) {
+    public void onNewItem(int id, Barcode barcode) {
         graphic.setId(id);
         if (barcodeUpdateListener != null) {
-            barcodeUpdateListener.onBarcodeDetected(item);
+            barcodeUpdateListener.onBarcodeDetected(barcode);
         }
     }
 
     @Override
-    public void onUpdate(Detector.Detections<Barcode> detectionResults, Barcode item) {
+    public void onUpdate(Detector.Detections<Barcode> detectionResults, Barcode barcode) {
         overlay.add(graphic);
-        graphic.updateItem(item);
+        graphic.updateItem(barcode);
     }
 
     @Override

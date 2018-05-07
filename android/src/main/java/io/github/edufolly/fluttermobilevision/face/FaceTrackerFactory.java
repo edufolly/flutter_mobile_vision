@@ -17,6 +17,7 @@ public class FaceTrackerFactory implements MultiProcessor.Factory<Face> {
         this.showText = showText;
     }
 
+    @Override
     public Tracker<Face> create(Face face) {
         FaceGraphic graphic = new FaceGraphic(graphicOverlay, showText);
         try {

@@ -48,14 +48,18 @@ public class OcrGraphic extends GraphicOverlay.Graphic {
     }
 
     private boolean showText;
-    private final TextBlock textBlock;
+    private volatile TextBlock textBlock;
 
-    OcrGraphic(GraphicOverlay overlay, TextBlock textBlock, boolean showText) {
+    OcrGraphic(GraphicOverlay overlay, boolean showText) {
         super(overlay);
 
-        this.textBlock = textBlock;
         this.showText = showText;
 
+        postInvalidate();
+    }
+
+    public void updateItem(TextBlock textBlock) {
+        this.textBlock = textBlock;
         postInvalidate();
     }
 
