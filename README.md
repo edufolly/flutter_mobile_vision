@@ -109,7 +109,7 @@ For Android, you must do the following before you can use the plugin:
 
 * Add the Barcode activity to your AndroidManifest.xml
 
-    `<activity android:name="io.github.edufolly.fluttermobilevision.BarcodeCaptureActivity" />`
+    `<activity android:name="io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity" />`
 
 ### iOS
 
