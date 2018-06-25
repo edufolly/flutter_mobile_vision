@@ -181,8 +181,12 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 }
                 result.error("No barcode captured, intent data is null", null, null);
             } else if (resultCode == CommonStatusCodes.ERROR) {
-                Exception e = intent.getParcelableExtra(BarcodeCaptureActivity.ERROR);
-                result.error(e.getMessage(), null, e);
+                if (intent != null) {
+                    Exception e = intent.getParcelableExtra(BarcodeCaptureActivity.ERROR);
+                    result.error(e.getMessage(), null, e);
+                } else {
+                    result.error("Intent is null (the camera permission may not be granted)", null, null);
+                }
             }
         } else if (requestCode == RC_OCR_READ) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
@@ -200,8 +204,12 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 }
                 result.error("No text recognized, intent data is null", null, null);
             } else if (resultCode == CommonStatusCodes.ERROR) {
-                Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
-                result.error(e.getMessage(), null, e);
+                if (intent != null) {
+                    Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
+                    result.error(e.getMessage(), null, e);
+                } else {
+                    result.error("Intent is null (the camera permission may not be granted)", null, null);
+                }
             }
         } else if (requestCode == RC_FACE_DETECT) {
             if (resultCode == CommonStatusCodes.SUCCESS) {
@@ -219,8 +227,12 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                 }
                 result.error("No face detected, intent data is null", null, null);
             } else if (resultCode == CommonStatusCodes.ERROR) {
-                Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
-                result.error(e.getMessage(), null, e);
+                if (intent != null) {
+                    Exception e = intent.getParcelableExtra(OcrCaptureActivity.ERROR);
+                    result.error(e.getMessage(), null, e);
+                } else {
+                    result.error("Intent is null (the camera permission may not be granted)", null, null);
+                }
             }
         }
         return false;
