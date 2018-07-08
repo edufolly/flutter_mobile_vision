@@ -1,3 +1,8 @@
+## [0.1.1] - 2018-07-08
+
+* Bug fixed - Crash when the permission is not granted on Android #7
+
+
 ## [0.1.0] - 2018-05-06
 
 * Production mode on.
