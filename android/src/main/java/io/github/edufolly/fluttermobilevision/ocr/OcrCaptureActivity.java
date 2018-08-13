@@ -54,6 +54,10 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
     }
 
     protected boolean onTap(float rawX, float rawY) {
+        if(!waitTap) {
+            return false;
+        }
+
         ArrayList<MyTextBlock> list = new ArrayList<>();
 
         if (multiple) {

@@ -27,6 +27,7 @@ class _MyAppState extends State<MyApp> {
   bool _autoFocusOcr = true;
   bool _torchOcr = false;
   bool _multipleOcr = false;
+  bool _waitTapOcr = false;
   bool _showTextOcr = true;
   List<OcrText> _textsOcr = [];
 
@@ -302,6 +303,12 @@ class _MyAppState extends State<MyApp> {
     ));
 
     items.add(new SwitchListTile(
+      title: const Text('WaitTap:'),
+      value: _waitTapOcr,
+      onChanged: (value) => setState(() => _waitTapOcr = value),
+    ));
+
+    items.add(new SwitchListTile(
       title: const Text('Show text:'),
       value: _showTextOcr,
       onChanged: (value) => setState(() => _showTextOcr = value),
@@ -350,6 +357,7 @@ class _MyAppState extends State<MyApp> {
         flash: _torchOcr,
         autoFocus: _autoFocusOcr,
         multiple: _multipleOcr,
+        waitTap: _waitTapOcr,
         showText: _showTextOcr,
         camera: _cameraOcr,
         fps: 2.0,
