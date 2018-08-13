@@ -29,6 +29,7 @@ class _MyAppState extends State<MyApp> {
   bool _multipleOcr = false;
   bool _waitTapOcr = false;
   bool _showTextOcr = true;
+  int _previewOcr = OcrText.LARGE;
   List<OcrText> _textsOcr = [];
 
   int _cameraFace = FlutterMobileVision.CAMERA_FRONT;
@@ -107,6 +108,22 @@ class _MyAppState extends State<MyApp> {
     ));
 
     return formatItems;
+  }
+
+  ///
+  /// Preview resolutions
+  ///
+  List<DropdownMenuItem<int>> _getPreviewResolutions() {
+    List<DropdownMenuItem<int>> resolutionItems = [];
+
+    OcrText.mapPreviewResolutions.forEach((key, value) {
+      resolutionItems.add(new DropdownMenuItem(
+        child: new Text(value),
+        value: key,
+      ));
+    });
+
+    return resolutionItems;
   }
 
   ///
@@ -284,6 +301,29 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: const Text('Preview Size:'),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: new DropdownButton(
+        items: _getPreviewResolutions(),
+        onChanged: (value) => setState(
+              () => _previewOcr = value,
+        ),
+        value: _previewOcr,
+      ),
+    ));
+
     items.add(new SwitchListTile(
       title: const Text('Auto focus:'),
       value: _autoFocusOcr,
@@ -297,13 +337,13 @@ class _MyAppState extends State<MyApp> {
     ));
 
     items.add(new SwitchListTile(
-      title: const Text('Multiple:'),
+      title: const Text('Return all texts:'),
       value: _multipleOcr,
       onChanged: (value) => setState(() => _multipleOcr = value),
     ));
 
     items.add(new SwitchListTile(
-      title: const Text('WaitTap:'),
+      title: const Text('Capture when tap screen:'),
       value: _waitTapOcr,
       onChanged: (value) => setState(() => _waitTapOcr = value),
     ));
@@ -359,6 +399,7 @@ class _MyAppState extends State<MyApp> {
         multiple: _multipleOcr,
         waitTap: _waitTapOcr,
         showText: _showTextOcr,
+        previewSize: _previewOcr,
         camera: _cameraOcr,
         fps: 2.0,
       );

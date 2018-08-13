@@ -49,6 +49,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private boolean multiple = false;
     private boolean waitTap = false;
     private boolean showText = false;
+    private int previewSize = CameraSource.PREVIEW_LARGE;
     private int camera = CameraSource.CAMERA_FACING_BACK;
     private float fps = 15.0f;
 
@@ -105,6 +106,10 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             showText = (boolean) arguments.get("showText");
         }
 
+        if (arguments.containsKey("previewSize")) {
+            previewSize = (int) arguments.get("previewSize");
+        }
+
         if (arguments.containsKey("camera")) {
             camera = (int) arguments.get("camera");
         }
@@ -148,6 +153,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(AbstractCaptureActivity.MULTIPLE, multiple);
         intent.putExtra(AbstractCaptureActivity.WAIT_TAP, waitTap);
         intent.putExtra(AbstractCaptureActivity.SHOW_TEXT, showText);
+        intent.putExtra(AbstractCaptureActivity.PREVIEW_SIZE, previewSize);
         intent.putExtra(AbstractCaptureActivity.CAMERA, camera);
         intent.putExtra(AbstractCaptureActivity.FPS, fps);
         activity.startActivityForResult(intent, res);

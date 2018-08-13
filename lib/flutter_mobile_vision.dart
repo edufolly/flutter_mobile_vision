@@ -50,6 +50,7 @@ class FlutterMobileVision {
     bool multiple: false,
     bool waitTap: false,
     bool showText: true,
+    int previewSize: OcrText.LARGE,
     int camera: CAMERA_BACK,
     double fps: 2.0,
   }) async {
@@ -59,6 +60,7 @@ class FlutterMobileVision {
       'multiple': multiple,
       'waitTap': waitTap,
       'showText': showText,
+      'previewSize': previewSize,
       'camera': camera,
       'fps': fps,
     };
@@ -214,12 +216,22 @@ class Barcode {
 ///
 ///
 class OcrText {
+  static const int LARGE = 0;
+  static const int MEDIUM = 1;
+  static const int SMALL = 2;
+
   final String value;
   final String language;
   final int top;
   final int bottom;
   final int left;
   final int right;
+
+  static const Map mapPreviewResolutions = {
+    LARGE: 'Full Size',
+    MEDIUM: '1280 by 720',
+    SMALL: '640 by 480',
+  };
 
   OcrText(
     this.value, {

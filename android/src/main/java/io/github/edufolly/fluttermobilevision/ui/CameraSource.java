@@ -78,6 +78,12 @@ public class CameraSource {
     public static final int CAMERA_FACING_BACK = CameraInfo.CAMERA_FACING_BACK;
     @SuppressLint("InlinedApi")
     public static final int CAMERA_FACING_FRONT = CameraInfo.CAMERA_FACING_FRONT;
+    @SuppressLint("InlinedApi")
+    public static final int PREVIEW_LARGE = 0;
+    @SuppressLint("InlinedApi")
+    public static final int PREVIEW_MEDIUM = 1;
+    @SuppressLint("InlinedApi")
+    public static final int PREVIEW_SMALL = 2;
 
     private static final String TAG = "OpenCameraSource";
 
