@@ -29,7 +29,9 @@ class _MyAppState extends State<MyApp> {
   bool _multipleOcr = false;
   bool _waitTapOcr = false;
   bool _showTextOcr = true;
-  int _previewOcr = OcrText.LARGE;
+  int _previewOcr = 0;
+  int _previewWidth = 640;
+  int _previewHeight = 480;
   List<OcrText> _textsOcr = [];
 
   int _cameraFace = FlutterMobileVision.CAMERA_FRONT;
@@ -39,9 +41,12 @@ class _MyAppState extends State<MyApp> {
   bool _showTextFace = true;
   List<Face> _faces = [];
 
+  List<dynamic> _cameraSizes = [];
+
   @override
   void initState() {
     super.initState();
+    _getCameraSizes(_cameraOcr);
   }
 
   @override
@@ -116,12 +121,21 @@ class _MyAppState extends State<MyApp> {
   List<DropdownMenuItem<int>> _getPreviewResolutions() {
     List<DropdownMenuItem<int>> resolutionItems = [];
 
-    OcrText.mapPreviewResolutions.forEach((key, value) {
+    if(_cameraSizes.length > 0) {
+      for (int i = 0; i < _cameraSizes.length; i++) {
+        Map<dynamic, dynamic> item = _cameraSizes[i];
+        String text = item["height"].toString() + " by "+ item["width"].toString();
+        resolutionItems.add(new DropdownMenuItem(
+          child: new Text(text),
+          value: i,
+        ));
+      }
+    } else {
       resolutionItems.add(new DropdownMenuItem(
-        child: new Text(value),
-        value: key,
+        child: new Text("Empty"),
+        value: 0,
       ));
-    });
+    }
 
     return resolutionItems;
   }
@@ -294,9 +308,10 @@ class _MyAppState extends State<MyApp> {
       ),
       child: new DropdownButton(
         items: _getCameras(),
-        onChanged: (value) => setState(
-              () => _cameraOcr = value,
-            ),
+        onChanged: (value) {
+          _getCameraSizes(value);
+          setState( () => _cameraOcr = value );
+        },
         value: _cameraOcr,
       ),
     ));
@@ -317,9 +332,11 @@ class _MyAppState extends State<MyApp> {
       ),
       child: new DropdownButton(
         items: _getPreviewResolutions(),
-        onChanged: (value) => setState(
-              () => _previewOcr = value,
-        ),
+        onChanged: (value) {
+          _previewHeight = _cameraSizes[value]["height"];
+          _previewWidth = _cameraSizes[value]["width"];
+          setState(() => _previewOcr = value);
+        },
         value: _previewOcr,
       ),
     ));
@@ -399,7 +416,8 @@ class _MyAppState extends State<MyApp> {
         multiple: _multipleOcr,
         waitTap: _waitTapOcr,
         showText: _showTextOcr,
-        previewSize: _previewOcr,
+        previewWidth: _previewWidth,
+        previewHeight: _previewHeight,
         camera: _cameraOcr,
         fps: 2.0,
       );
@@ -410,6 +428,27 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() => _textsOcr = texts);
+  }
+
+  ///
+  /// previewSizes Method
+  ///
+  Future<Null> _getCameraSizes(int facing) async {
+    List<dynamic> sizes = [];
+    try {
+      sizes = await FlutterMobileVision.getCameraSizes(camera: facing);
+    } on Exception {
+      sizes = [];
+    }
+
+    if (!mounted) return;
+
+    _previewOcr = 0;
+    if(_cameraSizes.length > 0) {
+      _previewHeight = _cameraSizes[_previewOcr]["height"];
+      _previewWidth = _cameraSizes[_previewOcr]["width"];
+    }
+    setState(() => _cameraSizes = sizes);
   }
 
   ///

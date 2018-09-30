@@ -40,23 +40,10 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
             }
         }
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
-        if(previewSize == CameraSource.PREVIEW_MEDIUM) {
-            width = 720;
-            height = 1280;
-        } else if (previewSize == CameraSource.PREVIEW_SMALL) {
-            width = 480;
-            height = 640;
-        }
-
         cameraSource = new CameraSource
                 .Builder(getApplicationContext(), textRecognizer)
                 .setFacing(camera)
-                .setRequestedPreviewSize(height, width)
+                .setRequestedPreviewSize(previewHeight, previewWidth)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .setRequestedFps(fps)

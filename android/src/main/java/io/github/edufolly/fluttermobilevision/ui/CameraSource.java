@@ -79,11 +79,9 @@ public class CameraSource {
     @SuppressLint("InlinedApi")
     public static final int CAMERA_FACING_FRONT = CameraInfo.CAMERA_FACING_FRONT;
     @SuppressLint("InlinedApi")
-    public static final int PREVIEW_LARGE = 0;
+    public static final int PREVIEW_WIDTH = 640;
     @SuppressLint("InlinedApi")
-    public static final int PREVIEW_MEDIUM = 1;
-    @SuppressLint("InlinedApi")
-    public static final int PREVIEW_SMALL = 2;
+    public static final int PREVIEW_HEIGHT = 480;
 
     private static final String TAG = "OpenCameraSource";
 
@@ -119,8 +117,8 @@ public class CameraSource {
     // These values may be requested by the caller.  Due to hardware limitations, we may need to
     // select close, but not exactly the same values for these.
     private float requestedFps = 30.0f;
-    private int requestedPreviewWidth = 1024;
-    private int requestedPreviewHeight = 768;
+    private int requestedPreviewWidth = PREVIEW_WIDTH;
+    private int requestedPreviewHeight = PREVIEW_HEIGHT;
 
     private String focusMode = null;
     private String flashMode = null;
@@ -846,6 +844,22 @@ public class CameraSource {
             }
         }
         return -1;
+    }
+
+    public static List<Size> getSizesForCameraFacing(int facing) {
+        List<Size> sizeList = new ArrayList<>();
+        int cameraId = CameraSource.getIdForRequestedCamera(facing);
+        if(cameraId == -1) return sizeList;
+
+        // Briefly open the camera to obtain valid sizes
+        Camera camera = Camera.open(cameraId);
+        List<SizePair> sizePairList= CameraSource.generateValidPreviewSizeList(camera);
+        for (SizePair sizePair : sizePairList) {
+            sizeList.add(sizePair.previewSize());
+        }
+        camera.release();
+
+        return sizeList;
     }
 
     /**

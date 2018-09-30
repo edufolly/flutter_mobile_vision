@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.support.v4.app.ActivityCompat;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.barcode.Barcode;
 
 import java.util.ArrayList;
@@ -49,8 +50,9 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private boolean multiple = false;
     private boolean waitTap = false;
     private boolean showText = false;
-    private int previewSize = CameraSource.PREVIEW_LARGE;
-    private int camera = CameraSource.CAMERA_FACING_BACK;
+    private int previewWidth = 640;
+    private int previewHeight = 480;
+    private int facing = CameraSource.CAMERA_FACING_BACK;
     private float fps = 15.0f;
 
     /**
@@ -106,12 +108,16 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
             showText = (boolean) arguments.get("showText");
         }
 
-        if (arguments.containsKey("previewSize")) {
-            previewSize = (int) arguments.get("previewSize");
+        if (arguments.containsKey("previewWidth")) {
+            previewWidth = (int) arguments.get("previewWidth");
+        }
+
+        if (arguments.containsKey("previewHeight")) {
+            previewHeight = (int) arguments.get("previewHeight");
         }
 
         if (arguments.containsKey("camera")) {
-            camera = (int) arguments.get("camera");
+            facing = (int) arguments.get("camera");
         }
 
         if (arguments.containsKey("fps")) {
@@ -133,7 +139,18 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         Intent intent;
         int res;
 
-        if ("scan".equals(call.method)) {
+        if ("cameraSizes".equals(call.method)) {
+            List<Size> sizeList = CameraSource.getSizesForCameraFacing(facing);
+            List<Map<String, Object>> list = new ArrayList<>();
+            for(Size size : sizeList) {
+                Map<String, Object> ret = new HashMap<>();
+                ret.put("width", size.getWidth());
+                ret.put("height", size.getHeight());
+                list.add(ret);
+            }
+            result.success(list);
+            return;
+        } else if ("scan".equals(call.method)) {
             intent = new Intent(activity, BarcodeCaptureActivity.class);
             res = RC_BARCODE_SCAN;
         } else if ("read".equals(call.method)) {
@@ -153,8 +170,9 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(AbstractCaptureActivity.MULTIPLE, multiple);
         intent.putExtra(AbstractCaptureActivity.WAIT_TAP, waitTap);
         intent.putExtra(AbstractCaptureActivity.SHOW_TEXT, showText);
-        intent.putExtra(AbstractCaptureActivity.PREVIEW_SIZE, previewSize);
-        intent.putExtra(AbstractCaptureActivity.CAMERA, camera);
+        intent.putExtra(AbstractCaptureActivity.PREVIEW_WIDTH, previewWidth);
+        intent.putExtra(AbstractCaptureActivity.PREVIEW_HEIGHT, previewHeight);
+        intent.putExtra(AbstractCaptureActivity.CAMERA, facing);
         intent.putExtra(AbstractCaptureActivity.FPS, fps);
         activity.startActivityForResult(intent, res);
     }
