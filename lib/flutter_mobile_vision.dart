@@ -9,6 +9,9 @@ class FlutterMobileVision {
   static const int CAMERA_BACK = 0;
   static const int CAMERA_FRONT = 1;
 
+  static const int PREVIEW_WIDTH = 640;
+  static const int PREVIEW_HEIGHT = 480;
+
   ///
   ///
   ///
@@ -48,7 +51,10 @@ class FlutterMobileVision {
     bool flash: false,
     bool autoFocus: true,
     bool multiple: false,
+    bool waitTap: false,
     bool showText: true,
+    int previewWidth: PREVIEW_WIDTH,
+    int previewHeight: PREVIEW_HEIGHT,
     int camera: CAMERA_BACK,
     double fps: 2.0,
   }) async {
@@ -56,7 +62,10 @@ class FlutterMobileVision {
       'flash': flash,
       'autoFocus': autoFocus,
       'multiple': multiple,
+      'waitTap': waitTap,
       'showText': showText,
+      'previewWidth': previewWidth,
+      'previewHeight': previewHeight,
       'camera': camera,
       'fps': fps,
     };
@@ -64,6 +73,21 @@ class FlutterMobileVision {
     final List list = await _channel.invokeMethod('read', arguments);
 
     return list.map((map) => OcrText.fromMap(map)).toList();
+  }
+
+  ///
+  /// Gets the available camera sizes for the device based on camera facing int.
+  ///
+  static Future<List<dynamic>> getCameraSizes({
+    int camera: CAMERA_BACK,
+  }) async {
+    Map<String, dynamic> arguments = {
+      'camera': camera,
+    };
+
+    final List<dynamic> list = await _channel.invokeMethod('cameraSizes', arguments);
+
+    return list;
   }
 
   ///

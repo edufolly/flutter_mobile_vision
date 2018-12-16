@@ -14,6 +14,7 @@ Liked? :star: Star the repo to support the project!
 
 * [x] Android
    * [x] Barcode Scan
+      * [x] Front or Back camera.
       * [x] Simple scan.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -25,6 +26,8 @@ Liked? :star: Star the repo to support the project!
       * [x] Show barcode text.
       * [x] Standard code.
    * [x] Recognize Text
+      * [x] Front or Back camera.
+      * [x] One of three preview sizes.
       * [x] Simple OCR.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -34,6 +37,7 @@ Liked? :star: Star the repo to support the project!
       * [x] Hide recognized text.
       * [x] Standard code.
    * [x] Detect Faces
+      * [x] Front or Back camera.
       * [x] Simple detection.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -128,6 +132,7 @@ try {
     autoFocus: _autoFocusOcr,
     multiple: _multipleOcr,
     showText: _showTextOcr,
+    previewSize: _previewOcr,
     camera: _cameraOcr,
     fps: 2.0,
   );

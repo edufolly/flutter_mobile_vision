@@ -40,13 +40,10 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
             }
         }
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
         cameraSource = new CameraSource
                 .Builder(getApplicationContext(), textRecognizer)
                 .setFacing(camera)
-                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+                .setRequestedPreviewSize(previewHeight, previewWidth)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .setRequestedFps(fps)
@@ -54,6 +51,10 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
     }
 
     protected boolean onTap(float rawX, float rawY) {
+        if(!waitTap) {
+            return false;
+        }
+
         ArrayList<MyTextBlock> list = new ArrayList<>();
 
         if (multiple) {
