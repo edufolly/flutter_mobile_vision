@@ -107,7 +107,7 @@ For Android, you must do the following before you can use the plugin:
 
     `<uses-permission android:name="android.permission.CAMERA" />`
 
-* Add the Barcode activity to your AndroidManifest.xml
+* Add the Barcode activity to your AndroidManifest.xml (after other activity nodes)
 
     `<activity android:name="io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity" />`
 
@@ -147,7 +147,7 @@ For Android, you must do the following before you can use the plugin:
 
     `<uses-permission android:name="android.permission.CAMERA" />`
 
-* Add the OCR activity to your AndroidManifest.xml
+* Add the OCR activity to your AndroidManifest.xml (after other activity nodes)
 
    `<activity android:name="io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity" />`
 
