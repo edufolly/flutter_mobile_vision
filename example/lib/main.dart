@@ -10,7 +10,7 @@ void main() => runApp(new MyApp());
 
 class MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -21,6 +21,7 @@ class _MyAppState extends State<MyApp> {
   bool _multipleBarcode = false;
   bool _waitTapBarcode = false;
   bool _showTextBarcode = false;
+  Size _previewBarcode;
   List<Barcode> _barcodes = [];
 
   int _cameraOcr = FlutterMobileVision.CAMERA_BACK;
@@ -29,9 +30,7 @@ class _MyAppState extends State<MyApp> {
   bool _multipleOcr = false;
   bool _waitTapOcr = false;
   bool _showTextOcr = true;
-  int _previewOcr = 0;
-  int _previewWidth = 640;
-  int _previewHeight = 480;
+  Size _previewOcr;
   List<OcrText> _textsOcr = [];
 
   int _cameraFace = FlutterMobileVision.CAMERA_FRONT;
@@ -39,14 +38,17 @@ class _MyAppState extends State<MyApp> {
   bool _torchFace = false;
   bool _multipleFace = true;
   bool _showTextFace = true;
+  Size _previewFace;
   List<Face> _faces = [];
-
-  List<dynamic> _cameraSizes = [];
 
   @override
   void initState() {
     super.initState();
-    _getCameraSizes(_cameraOcr);
+    FlutterMobileVision.start().then((previewSizes) => setState(() {
+      _previewBarcode = previewSizes[_cameraBarcode].first;
+      _previewOcr = previewSizes[_cameraOcr].first;
+      _previewFace = previewSizes[_cameraFace].first;
+    }));
   }
 
   @override
@@ -71,7 +73,7 @@ class _MyAppState extends State<MyApp> {
             title: new Text('Flutter Mobile Vision'),
           ),
           body: new TabBarView(children: [
-            _getScanScreen(context),
+            _getBarcodeScreen(context),
             _getOcrScreen(context),
             _getFaceScreen(context),
           ]),
@@ -87,10 +89,12 @@ class _MyAppState extends State<MyApp> {
     List<DropdownMenuItem<int>> formatItems = [];
 
     Barcode.mapFormat.forEach((key, value) {
-      formatItems.add(new DropdownMenuItem(
-        child: new Text(value),
-        value: key,
-      ));
+      formatItems.add(
+        new DropdownMenuItem(
+          child: new Text(value),
+          value: key,
+        ),
+      );
     });
 
     return formatItems;
@@ -100,50 +104,54 @@ class _MyAppState extends State<MyApp> {
   /// Camera list
   ///
   List<DropdownMenuItem<int>> _getCameras() {
-    List<DropdownMenuItem<int>> formatItems = [];
+    List<DropdownMenuItem<int>> cameraItems = [];
 
-    formatItems.add(new DropdownMenuItem(
+    cameraItems.add(new DropdownMenuItem(
       child: new Text('BACK'),
       value: FlutterMobileVision.CAMERA_BACK,
     ));
 
-    formatItems.add(new DropdownMenuItem(
+    cameraItems.add(new DropdownMenuItem(
       child: new Text('FRONT'),
       value: FlutterMobileVision.CAMERA_FRONT,
     ));
 
-    return formatItems;
+    return cameraItems;
   }
 
   ///
-  /// Preview resolutions
+  /// Preview sizes list
   ///
-  List<DropdownMenuItem<int>> _getPreviewResolutions() {
-    List<DropdownMenuItem<int>> resolutionItems = [];
+  List<DropdownMenuItem<Size>> _getPreviewSizes(int facing) {
+    List<DropdownMenuItem<Size>> previewItems = [];
 
-    if(_cameraSizes.length > 0) {
-      for (int i = 0; i < _cameraSizes.length; i++) {
-        Map<dynamic, dynamic> item = _cameraSizes[i];
-        String text = item["height"].toString() + " by "+ item["width"].toString();
-        resolutionItems.add(new DropdownMenuItem(
-          child: new Text(text),
-          value: i,
-        ));
-      }
+    List<Size> sizes = FlutterMobileVision.getPreviewSizes(facing);
+
+    if (sizes != null) {
+      sizes.forEach((size) {
+        previewItems.add(
+          new DropdownMenuItem(
+            child: new Text(size.toString()),
+            value: size,
+          ),
+        );
+      });
     } else {
-      resolutionItems.add(new DropdownMenuItem(
-        child: new Text("Empty"),
-        value: 0,
-      ));
+      previewItems.add(
+        new DropdownMenuItem(
+          child: new Text('Empty'),
+          value: null,
+        ),
+      );
     }
 
-    return resolutionItems;
+    return previewItems;
   }
 
   ///
-  /// Scan Screen
+  /// Barcode Screen
   ///
-  Widget _getScanScreen(BuildContext context) {
+  Widget _getBarcodeScreen(BuildContext context) {
     List<Widget> items = [];
 
     items.add(new Padding(
@@ -162,10 +170,34 @@ class _MyAppState extends State<MyApp> {
       ),
       child: new DropdownButton(
         items: _getCameras(),
-        onChanged: (value) => setState(
-              () => _cameraBarcode = value,
-            ),
+        onChanged: (value) {
+          _previewBarcode = null;
+          setState(() => _cameraBarcode = value);
+        },
         value: _cameraBarcode,
+      ),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: const Text('Preview size:'),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: new DropdownButton(
+        items: _getPreviewSizes(_cameraBarcode),
+        onChanged: (value) {
+          setState(() => _previewBarcode = value);
+        },
+        value: _previewBarcode,
       ),
     ));
 
@@ -262,7 +294,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   ///
-  /// Scan Method
+  /// Barcode Method
   ///
   Future<Null> _scan() async {
     List<Barcode> barcodes = [];
@@ -274,6 +306,7 @@ class _MyAppState extends State<MyApp> {
         multiple: _multipleBarcode,
         waitTap: _waitTapBarcode,
         showText: _showTextBarcode,
+        preview: _previewBarcode,
         camera: _cameraBarcode,
         fps: 15.0,
       );
@@ -309,8 +342,8 @@ class _MyAppState extends State<MyApp> {
       child: new DropdownButton(
         items: _getCameras(),
         onChanged: (value) {
-          _getCameraSizes(value);
-          setState( () => _cameraOcr = value );
+          _previewOcr = null;
+          setState(() => _cameraOcr = value);
         },
         value: _cameraOcr,
       ),
@@ -322,7 +355,7 @@ class _MyAppState extends State<MyApp> {
         left: 18.0,
         right: 18.0,
       ),
-      child: const Text('Preview Size:'),
+      child: const Text('Preview size:'),
     ));
 
     items.add(new Padding(
@@ -331,10 +364,8 @@ class _MyAppState extends State<MyApp> {
         right: 18.0,
       ),
       child: new DropdownButton(
-        items: _getPreviewResolutions(),
+        items: _getPreviewSizes(_cameraOcr),
         onChanged: (value) {
-          _previewHeight = _cameraSizes[value]["height"];
-          _previewWidth = _cameraSizes[value]["width"];
           setState(() => _previewOcr = value);
         },
         value: _previewOcr,
@@ -416,8 +447,7 @@ class _MyAppState extends State<MyApp> {
         multiple: _multipleOcr,
         waitTap: _waitTapOcr,
         showText: _showTextOcr,
-        previewWidth: _previewWidth,
-        previewHeight: _previewHeight,
+        preview: _previewOcr,
         camera: _cameraOcr,
         fps: 2.0,
       );
@@ -428,27 +458,6 @@ class _MyAppState extends State<MyApp> {
     if (!mounted) return;
 
     setState(() => _textsOcr = texts);
-  }
-
-  ///
-  /// previewSizes Method
-  ///
-  Future<Null> _getCameraSizes(int facing) async {
-    List<dynamic> sizes = [];
-    try {
-      sizes = await FlutterMobileVision.getCameraSizes(camera: facing);
-    } on Exception {
-      sizes = [];
-    }
-
-    if (!mounted) return;
-
-    _previewOcr = 0;
-    if(_cameraSizes.length > 0) {
-      _previewHeight = _cameraSizes[_previewOcr]["height"];
-      _previewWidth = _cameraSizes[_previewOcr]["width"];
-    }
-    setState(() => _cameraSizes = sizes);
   }
 
   ///
@@ -473,10 +482,34 @@ class _MyAppState extends State<MyApp> {
       ),
       child: new DropdownButton(
         items: _getCameras(),
-        onChanged: (value) => setState(
-              () => _cameraFace = value,
-            ),
+        onChanged: (value) {
+          _previewFace = null;
+          setState(() => _cameraFace = value);
+        },
         value: _cameraFace,
+      ),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        top: 8.0,
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: const Text('Preview size:'),
+    ));
+
+    items.add(new Padding(
+      padding: const EdgeInsets.only(
+        left: 18.0,
+        right: 18.0,
+      ),
+      child: new DropdownButton(
+        items: _getPreviewSizes(_cameraFace),
+        onChanged: (value) {
+          setState(() => _previewFace = value);
+        },
+        value: _previewFace,
       ),
     ));
 
@@ -548,6 +581,7 @@ class _MyAppState extends State<MyApp> {
         autoFocus: _autoFocusFace,
         multiple: _multipleFace,
         showText: _showTextFace,
+        preview: _previewFace,
         camera: _cameraFace,
         fps: 15.0,
       );

@@ -43,13 +43,10 @@ public final class FaceCaptureActivity extends AbstractCaptureActivity<FaceGraph
             }
         }
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
         cameraSource = new CameraSource
                 .Builder(getApplicationContext(), faceDetector)
                 .setFacing(camera)
-                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+                .setRequestedPreviewSize(previewWidth, previewHeight)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .setRequestedFps(fps)

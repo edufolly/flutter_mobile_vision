@@ -848,15 +848,22 @@ public class CameraSource {
 
     public static List<Size> getSizesForCameraFacing(int facing) {
         List<Size> sizeList = new ArrayList<>();
+
         int cameraId = CameraSource.getIdForRequestedCamera(facing);
-        if(cameraId == -1) return sizeList;
+
+        if (cameraId == -1) {
+            return sizeList;
+        }
 
         // Briefly open the camera to obtain valid sizes
         Camera camera = Camera.open(cameraId);
-        List<SizePair> sizePairList= CameraSource.generateValidPreviewSizeList(camera);
+
+        List<SizePair> sizePairList = CameraSource.generateValidPreviewSizeList(camera);
+
         for (SizePair sizePair : sizePairList) {
             sizeList.add(sizePair.previewSize());
         }
+
         camera.release();
 
         return sizeList;

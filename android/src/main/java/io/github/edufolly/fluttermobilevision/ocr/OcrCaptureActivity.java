@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Camera;
-import android.util.DisplayMetrics;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
@@ -43,7 +42,7 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
         cameraSource = new CameraSource
                 .Builder(getApplicationContext(), textRecognizer)
                 .setFacing(camera)
-                .setRequestedPreviewSize(previewHeight, previewWidth)
+                .setRequestedPreviewSize(previewWidth, previewHeight)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .setRequestedFps(fps)

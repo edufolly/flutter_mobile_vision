@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Camera;
-import android.util.DisplayMetrics;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
@@ -44,13 +43,10 @@ public final class BarcodeCaptureActivity extends AbstractCaptureActivity<Barcod
             }
         }
 
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
         cameraSource = new CameraSource
                 .Builder(getApplicationContext(), barcodeDetector)
                 .setFacing(camera)
-                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+                .setRequestedPreviewSize(previewWidth, previewHeight)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .setRequestedFps(fps)

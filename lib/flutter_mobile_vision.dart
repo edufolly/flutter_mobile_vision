@@ -9,8 +9,32 @@ class FlutterMobileVision {
   static const int CAMERA_BACK = 0;
   static const int CAMERA_FRONT = 1;
 
-  static const int PREVIEW_WIDTH = 640;
-  static const int PREVIEW_HEIGHT = 480;
+  static const Size PREVIEW = const Size(640, 480);
+
+  static Map<int, List<Size>> _previewSizes = {};
+
+  ///
+  ///
+  ///
+  static Future<Map<int, List<Size>>> start() async {
+    var value = await _channel.invokeMethod('start');
+    value.forEach((k, v) {
+      List<Size> list = [];
+      v.forEach((map) => list.add(Size.fromMap(map)));
+      _previewSizes[k] = list;
+    });
+    return _previewSizes;
+  }
+
+  ///
+  ///
+  ///
+  static List<Size> getPreviewSizes(int facing) {
+    if (_previewSizes.containsKey(facing)) {
+      return _previewSizes[facing];
+    }
+    return null;
+  }
 
   ///
   ///
@@ -22,6 +46,7 @@ class FlutterMobileVision {
     bool multiple: false,
     bool waitTap: false,
     bool showText: false,
+    Size preview: PREVIEW,
     int camera: CAMERA_BACK,
     double fps: 15.0,
   }) async {
@@ -35,6 +60,8 @@ class FlutterMobileVision {
       'multiple': multiple,
       'waitTap': waitTap,
       'showText': showText,
+      'previewWidth': preview != null ? preview.width : PREVIEW.width,
+      'previewHeight': preview != null ? preview.height : PREVIEW.height,
       'camera': camera,
       'fps': fps,
     };
@@ -53,8 +80,7 @@ class FlutterMobileVision {
     bool multiple: false,
     bool waitTap: false,
     bool showText: true,
-    int previewWidth: PREVIEW_WIDTH,
-    int previewHeight: PREVIEW_HEIGHT,
+    Size preview: PREVIEW,
     int camera: CAMERA_BACK,
     double fps: 2.0,
   }) async {
@@ -64,8 +90,8 @@ class FlutterMobileVision {
       'multiple': multiple,
       'waitTap': waitTap,
       'showText': showText,
-      'previewWidth': previewWidth,
-      'previewHeight': previewHeight,
+      'previewWidth': preview != null ? preview.width : PREVIEW.width,
+      'previewHeight': preview != null ? preview.height : PREVIEW.height,
       'camera': camera,
       'fps': fps,
     };
@@ -76,21 +102,6 @@ class FlutterMobileVision {
   }
 
   ///
-  /// Gets the available camera sizes for the device based on camera facing int.
-  ///
-  static Future<List<dynamic>> getCameraSizes({
-    int camera: CAMERA_BACK,
-  }) async {
-    Map<String, dynamic> arguments = {
-      'camera': camera,
-    };
-
-    final List<dynamic> list = await _channel.invokeMethod('cameraSizes', arguments);
-
-    return list;
-  }
-
-  ///
   ///
   ///
   static Future<List<Face>> face({
@@ -98,6 +109,7 @@ class FlutterMobileVision {
     bool autoFocus: true,
     bool multiple: true,
     bool showText: true,
+    Size preview: PREVIEW,
     int camera: CAMERA_BACK,
     double fps: 15.0,
   }) async {
@@ -106,6 +118,8 @@ class FlutterMobileVision {
       'autoFocus': autoFocus,
       'multiple': multiple,
       'showText': showText,
+      'previewWidth': preview != null ? preview.width : PREVIEW.width,
+      'previewHeight': preview != null ? preview.height : PREVIEW.height,
       'camera': camera,
       'fps': fps,
     };
@@ -325,5 +339,23 @@ class Face {
       'left': left,
       'right': right,
     };
+  }
+}
+
+///
+///
+///
+class Size {
+  final int width;
+  final int height;
+
+  const Size(this.width, this.height);
+
+  Size.fromMap(Map map)
+      : width = map['width'],
+        height = map['height'];
+
+  String toString() {
+    return '$width x $height';
   }
 }

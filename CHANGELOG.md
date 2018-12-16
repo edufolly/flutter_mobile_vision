@@ -1,3 +1,8 @@
+## [0.1.2] - 2018-12-16
+
+* Camera preview size implementation. Important!! FlutterMobileVision.start()
+
+
 ## [0.1.1] - 2018-07-08
 
 * Bug fixed - Crash when the permission is not granted on Android #7

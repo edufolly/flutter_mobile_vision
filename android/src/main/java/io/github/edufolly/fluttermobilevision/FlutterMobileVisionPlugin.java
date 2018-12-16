@@ -1,6 +1,7 @@
 package io.github.edufolly.fluttermobilevision;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -52,7 +53,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     private boolean showText = false;
     private int previewWidth = 640;
     private int previewHeight = 480;
-    private int facing = CameraSource.CAMERA_FACING_BACK;
+    private int camera = CameraSource.CAMERA_FACING_BACK;
     private float fps = 15.0f;
 
     /**
@@ -76,9 +77,13 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
     @Override
     public void onMethodCall(MethodCall call, Result result) {
 
-        final Map<String, Object> arguments = call.arguments();
-
         this.result = result;
+
+        Map<String, Object> arguments = new HashMap<>();
+
+        if (call.arguments() != null) {
+            arguments = call.arguments();
+        }
 
         if (arguments.containsKey("flash")) {
             useFlash = (boolean) arguments.get("flash");
@@ -117,7 +122,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         }
 
         if (arguments.containsKey("camera")) {
-            facing = (int) arguments.get("camera");
+            camera = (int) arguments.get("camera");
         }
 
         if (arguments.containsKey("fps")) {
@@ -139,16 +144,29 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         Intent intent;
         int res;
 
-        if ("cameraSizes".equals(call.method)) {
-            List<Size> sizeList = CameraSource.getSizesForCameraFacing(facing);
-            List<Map<String, Object>> list = new ArrayList<>();
-            for(Size size : sizeList) {
-                Map<String, Object> ret = new HashMap<>();
-                ret.put("width", size.getWidth());
-                ret.put("height", size.getHeight());
-                list.add(ret);
+        if ("start".equals(call.method)) {
+
+            @SuppressLint("UseSparseArrays")
+            Map<Integer, List> map = new HashMap<>();
+
+            int[] cameras = new int[]{CameraSource.CAMERA_FACING_BACK, CameraSource.CAMERA_FACING_FRONT};
+
+            for (int facing : cameras) {
+
+                List<Size> sizeList = CameraSource.getSizesForCameraFacing(facing);
+
+                List<Map<String, Object>> list = new ArrayList<>();
+                for (Size size : sizeList) {
+                    Map<String, Object> ret = new HashMap<>();
+                    ret.put("width", size.getWidth());
+                    ret.put("height", size.getHeight());
+                    list.add(ret);
+                }
+
+                map.put(facing, list);
             }
-            result.success(list);
+
+            result.success(map);
             return;
         } else if ("scan".equals(call.method)) {
             intent = new Intent(activity, BarcodeCaptureActivity.class);
@@ -172,7 +190,7 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(AbstractCaptureActivity.SHOW_TEXT, showText);
         intent.putExtra(AbstractCaptureActivity.PREVIEW_WIDTH, previewWidth);
         intent.putExtra(AbstractCaptureActivity.PREVIEW_HEIGHT, previewHeight);
-        intent.putExtra(AbstractCaptureActivity.CAMERA, facing);
+        intent.putExtra(AbstractCaptureActivity.CAMERA, camera);
         intent.putExtra(AbstractCaptureActivity.FPS, fps);
         activity.startActivityForResult(intent, res);
     }

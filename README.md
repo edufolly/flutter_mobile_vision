@@ -15,6 +15,7 @@ Liked? :star: Star the repo to support the project!
 * [x] Android
    * [x] Barcode Scan
       * [x] Front or Back camera.
+      * [x] Select preview sizes.
       * [x] Simple scan.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -27,7 +28,7 @@ Liked? :star: Star the repo to support the project!
       * [x] Standard code.
    * [x] Recognize Text
       * [x] Front or Back camera.
-      * [x] One of three preview sizes.
+      * [x] Select preview sizes.
       * [x] Simple OCR.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -38,6 +39,7 @@ Liked? :star: Star the repo to support the project!
       * [x] Standard code.
    * [x] Detect Faces
       * [x] Front or Back camera.
+      * [x] Select preview sizes.
       * [x] Simple detection.
       * [x] Toggle torch.
       * [x] Toggle auto focus.
@@ -74,7 +76,31 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision: ^0.1.1
+    flutter_mobile_vision: ^0.1.4
+```
+
+* add FlutterMobileVision.start() to initState():
+
+```dart
+@override
+void initState() {
+  super.initState();
+  FlutterMobileVision.start().then((x) => setState(() {}));
+}
+```
+
+or for a better implementation:
+
+```dart
+@override
+void initState() {
+  super.initState();
+  FlutterMobileVision.start().then((previewSizes) => setState(() {
+    _previewBarcode = previewSizes[_cameraBarcode].first;
+    _previewOcr = previewSizes[_cameraOcr].first;
+    _previewFace = previewSizes[_cameraFace].first;
+  }));
+}
 ```
 
 -----
@@ -92,6 +118,7 @@ try {
     multiple: _multipleBarcode,
     waitTap: _waitTapBarcode,
     showText: _showTextBarcode,
+    preview: _previewBarcode,
     camera: _cameraBarcode,
     fps: 15.0,
   );
@@ -133,6 +160,7 @@ try {
     multiple: _multipleOcr,
     showText: _showTextOcr,
     previewSize: _previewOcr,
+    preview: _previewOcr,
     camera: _cameraOcr,
     fps: 2.0,
   );
@@ -173,6 +201,7 @@ try {
     autoFocus: _autoFocusFace,
     multiple: _multipleFace,
     showText: _showTextFace,
+    preview: _previewFace,
     camera: _cameraFace,
     fps: 15.0,
   );
