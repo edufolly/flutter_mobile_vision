@@ -76,7 +76,7 @@ To use this plugin :
   dependencies:
     flutter:
       sdk: flutter
-    flutter_mobile_vision: ^0.1.4
+    flutter_mobile_vision: ^0.1.3
 ```
 
 * add FlutterMobileVision.start() to initState():
