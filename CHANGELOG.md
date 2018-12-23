@@ -1,3 +1,8 @@
+## [0.1.3] - 2018-12-23
+
+* Improvements to get camera permission.
+
+
 ## [0.1.2] - 2018-12-16
 
 * Camera preview size implementation. Important!! FlutterMobileVision.start()
