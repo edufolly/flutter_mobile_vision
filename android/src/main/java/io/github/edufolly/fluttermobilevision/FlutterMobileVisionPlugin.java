@@ -37,7 +37,7 @@ import io.github.edufolly.fluttermobilevision.util.AbstractCaptureActivity;
  * FlutterMobileVisionPlugin
  */
 public class FlutterMobileVisionPlugin implements MethodCallHandler,
-        PluginRegistry.ActivityResultListener, RequestPermissionsResultListener {
+        PluginRegistry.ActivityResultListener {
 
     private static final int REQUEST_CAMERA_PERMISSIONS = 2;
     private static final int RC_BARCODE_SCAN = 9010;
