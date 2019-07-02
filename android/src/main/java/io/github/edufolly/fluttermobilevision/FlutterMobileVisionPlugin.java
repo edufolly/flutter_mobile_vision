@@ -146,17 +146,28 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
 
         switch (call.method) {
             case "start":
-                if (ContextCompat.checkSelfPermission(registrar.activity(),
-                        Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
+                @SuppressLint("UseSparseArrays")
+                Map<Integer, List> map = new HashMap<>();
 
-                    ActivityCompat.requestPermissions(registrar.activity(),
-                            new String[]{Manifest.permission.CAMERA},
-                            REQUEST_CAMERA_PERMISSIONS);
+                int[] cameras = new int[]{CameraSource.CAMERA_FACING_BACK,
+                        CameraSource.CAMERA_FACING_FRONT};
 
-                    return;
+                for (int facing : cameras) {
+
+                    List<Size> sizeList = CameraSource.getSizesForCameraFacing(facing);
+
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    for (Size size : sizeList) {
+                        Map<String, Object> ret = new HashMap<>();
+                        ret.put("width", size.getWidth());
+                        ret.put("height", size.getHeight());
+                        list.add(ret);
+                    }
+
+                    map.put(facing, list);
                 }
-                start();
+
+                pendingResult.success(map);
                 return;
 
             case "scan":
@@ -190,34 +201,6 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
         intent.putExtra(AbstractCaptureActivity.CAMERA, camera);
         intent.putExtra(AbstractCaptureActivity.FPS, fps);
         registrar.activity().startActivityForResult(intent, res);
-    }
-
-    /**
-     *
-     */
-    private void start() {
-        @SuppressLint("UseSparseArrays")
-        Map<Integer, List> map = new HashMap<>();
-
-        int[] cameras = new int[]{CameraSource.CAMERA_FACING_BACK,
-                CameraSource.CAMERA_FACING_FRONT};
-
-        for (int facing : cameras) {
-
-            List<Size> sizeList = CameraSource.getSizesForCameraFacing(facing);
-
-            List<Map<String, Object>> list = new ArrayList<>();
-            for (Size size : sizeList) {
-                Map<String, Object> ret = new HashMap<>();
-                ret.put("width", size.getWidth());
-                ret.put("height", size.getHeight());
-                list.add(ret);
-            }
-
-            map.put(facing, list);
-        }
-
-        pendingResult.success(map);
     }
 
     /**
@@ -307,28 +290,6 @@ public class FlutterMobileVisionPlugin implements MethodCallHandler,
                     pendingResult.error("Intent is null (the camera permission may not be granted)", null, null);
                 }
             }
-        }
-        return false;
-    }
-
-    /**
-     * @param requestCode  requestCode
-     * @param permissions  permissions
-     * @param grantResults grantResults
-     * @return boolean
-     */
-    @Override
-    public boolean onRequestPermissionsResult(int requestCode, String[] permissions,
-                                              int[] grantResults) {
-
-        if (requestCode == REQUEST_CAMERA_PERMISSIONS) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                start();
-            } else {
-                pendingResult.error("no_permissions",
-                        "this plugin requires camera permissions for scanning", null);
-            }
-            return true;
         }
         return false;
     }
