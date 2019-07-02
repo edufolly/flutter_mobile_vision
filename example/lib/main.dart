@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
-import 'package:flutter_mobile_vision_example/barcode_detail.dart';
-import 'package:flutter_mobile_vision_example/face_detail.dart';
-import 'package:flutter_mobile_vision_example/ocr_text_detail.dart';
+import './barcode_detail.dart';
+import './face_detail.dart';
+import './ocr_text_detail.dart';
 
 void main() => runApp(new MyApp());
 
