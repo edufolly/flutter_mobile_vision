@@ -1048,6 +1048,8 @@ public class CameraSource {
         if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             angle = (cameraInfo.orientation + degrees) % 360;
             displayAngle = (360 - angle); // compensate for it being mirrored
+            //fixed crash when use Camera Front and Device orientation is landscape LEFT
+            if(displayAngle == 360) displayAngle = 0;
         } else {  // back-facing
             angle = (cameraInfo.orientation - degrees + 360) % 360;
             displayAngle = angle;
