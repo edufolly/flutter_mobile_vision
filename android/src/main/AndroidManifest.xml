@@ -1,3 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="io.github.edufolly.flutter_mobile_vision">
+    package="io.github.edufolly.flutter_mobile_vision">
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
 </manifest>
