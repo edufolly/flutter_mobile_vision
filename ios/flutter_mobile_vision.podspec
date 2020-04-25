@@ -1,12 +1,13 @@
 #
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
+# Run `pod lib lint flutter_mobile_vision.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_mobile_vision'
   s.version          = '0.0.1'
-  s.summary          = 'Flutter implementation for Google Mobile Vision'
+  s.summary          = 'A new Flutter plugin.'
   s.description      = <<-DESC
-Flutter implementation for Google Mobile Vision
+A new Flutter plugin.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
@@ -15,7 +16,8 @@ Flutter implementation for Google Mobile Vision
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  
-  s.ios.deployment_target = '8.0'
-end
+  s.platform = :ios, '8.0'
 
+  # Flutter.framework does not contain a i386 slice. Only x86_64 simulators are supported.
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'VALID_ARCHS[sdk=iphonesimulator*]' => 'x86_64' }
+end

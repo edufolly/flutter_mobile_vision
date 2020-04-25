@@ -1,5 +1,5 @@
-group 'io.github.edufolly.fluttermobilevision'
-version '1.0-SNAPSHOT'
+group 'io.github.edufolly.flutter_mobile_vision'
+//version '1.0'
 
 buildscript {
     repositories {
@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.6.3'
     }
 }
 
@@ -22,11 +22,10 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 16
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -34,6 +33,5 @@ android {
 }
 
 dependencies {
-    api 'com.google.android.material:material:1.0.0'
-    api 'com.google.android.gms:play-services-vision:15.0.0'
+    api 'com.google.android.gms:play-services-vision:20.0.0'
 }

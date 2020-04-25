@@ -1,3 +1,8 @@
+## [0.1.4] - 2020-04-25
+
+* Project structure update.
+
+
 ## [0.1.3] - 2018-12-23
 
 * Improvements to get camera permission.
