@@ -77,6 +77,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
             camera = getIntent().getIntExtra(CAMERA, CameraSource.CAMERA_FACING_BACK);
             fps = getIntent().getFloatExtra(FPS, 15.0f);
 
+            createCameraSource();
 
             gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
                 @Override
@@ -89,7 +90,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
         }
     }
 
-//    protected abstract void createCameraSource() throws MobileVisionException;
+    protected abstract void createCameraSource() throws MobileVisionException;
 
     private void onError(Exception e) {
         Intent data = new Intent();
