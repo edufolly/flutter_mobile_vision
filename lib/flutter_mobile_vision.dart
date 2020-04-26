@@ -3,15 +3,14 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class FlutterMobileVision {
-  static const MethodChannel _channel =
-      const MethodChannel('flutter_mobile_vision');
+  static const MethodChannel _channel = MethodChannel('flutter_mobile_vision');
 
   static const int CAMERA_BACK = 0;
   static const int CAMERA_FRONT = 1;
 
-  static const Size PREVIEW = const Size(640, 480);
+  static const Size PREVIEW = Size(640, 480);
 
-  static Map<int, List<Size>> _previewSizes = {};
+  static final Map<int, List<Size>> _previewSizes = {};
 
   ///
   ///
@@ -40,15 +39,15 @@ class FlutterMobileVision {
   ///
   ///
   static Future<List<Barcode>> scan({
-    bool flash: false,
-    bool autoFocus: true,
-    int formats: Barcode.ALL_FORMATS,
-    bool multiple: false,
-    bool waitTap: false,
-    bool showText: false,
-    Size preview: PREVIEW,
-    int camera: CAMERA_BACK,
-    double fps: 15.0,
+    bool flash = false,
+    bool autoFocus = true,
+    int formats = Barcode.ALL_FORMATS,
+    bool multiple = false,
+    bool waitTap = false,
+    bool showText = false,
+    Size preview = PREVIEW,
+    int camera = CAMERA_BACK,
+    double fps = 15.0,
   }) async {
     if (multiple) {
       waitTap = true;
@@ -75,14 +74,14 @@ class FlutterMobileVision {
   ///
   ///
   static Future<List<OcrText>> read({
-    bool flash: false,
-    bool autoFocus: true,
-    bool multiple: false,
-    bool waitTap: false,
-    bool showText: true,
-    Size preview: PREVIEW,
-    int camera: CAMERA_BACK,
-    double fps: 2.0,
+    bool flash = false,
+    bool autoFocus = true,
+    bool multiple = false,
+    bool waitTap = false,
+    bool showText = true,
+    Size preview = PREVIEW,
+    int camera = CAMERA_BACK,
+    double fps = 2.0,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
@@ -105,13 +104,13 @@ class FlutterMobileVision {
   ///
   ///
   static Future<List<Face>> face({
-    bool flash: false,
-    bool autoFocus: true,
-    bool multiple: true,
-    bool showText: true,
-    Size preview: PREVIEW,
-    int camera: CAMERA_BACK,
-    double fps: 15.0,
+    bool flash = false,
+    bool autoFocus = true,
+    bool multiple = true,
+    bool showText = true,
+    Size preview = PREVIEW,
+    int camera = CAMERA_BACK,
+    double fps = 15.0,
   }) async {
     Map<String, dynamic> arguments = {
       'flash': flash,
@@ -205,13 +204,13 @@ class Barcode {
 
   Barcode(
     this.displayValue, {
-    this.rawValue: '',
-    this.format: 99,
-    this.valueFormat: 99,
-    this.top: -1,
-    this.bottom: -1,
-    this.left: -1,
-    this.right: -1,
+    this.rawValue = '',
+    this.format = 99,
+    this.valueFormat = 99,
+    this.top = -1,
+    this.bottom = -1,
+    this.left = -1,
+    this.right = -1,
   });
 
   Barcode.fromMap(Map map)
@@ -259,11 +258,11 @@ class OcrText {
 
   OcrText(
     this.value, {
-    this.language: '',
-    this.top: -1,
-    this.bottom: -1,
-    this.left: -1,
-    this.right: -1,
+    this.language = '',
+    this.top = -1,
+    this.bottom = -1,
+    this.left = -1,
+    this.right = -1,
   });
 
   OcrText.fromMap(Map map)
@@ -303,15 +302,15 @@ class Face {
 
   Face(
     this.id, {
-    this.eulerY: -1.0,
-    this.eulerZ: -1.0,
-    this.leftEyeOpenProbability: -1.0,
-    this.rightEyeOpenProbability: -1.0,
-    this.smilingProbability: -1.0,
-    this.top: -1,
-    this.bottom: -1,
-    this.left: -1,
-    this.right: -1,
+    this.eulerY = -1.0,
+    this.eulerZ = -1.0,
+    this.leftEyeOpenProbability = -1.0,
+    this.rightEyeOpenProbability = -1.0,
+    this.smilingProbability = -1.0,
+    this.top = -1,
+    this.bottom = -1,
+    this.left = -1,
+    this.right = -1,
   });
 
   Face.fromMap(Map map)
@@ -355,6 +354,7 @@ class Size {
       : width = map['width'],
         height = map['height'];
 
+  @override
   String toString() {
     return '$width x $height';
   }

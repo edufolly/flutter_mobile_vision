@@ -2,17 +2,26 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
-import './barcode_detail.dart';
-import './face_detail.dart';
-import './ocr_text_detail.dart';
+import 'barcode_detail.dart';
+import 'face_detail.dart';
+import 'ocr_text_detail.dart';
 
-void main() => runApp(new MyApp());
+///
+///
+///
+void main() => runApp(MyApp());
 
+///
+///
+///
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
+///
+///
+///
 class _MyAppState extends State<MyApp> {
   int _cameraBarcode = FlutterMobileVision.CAMERA_BACK;
   int _onlyFormatBarcode = Barcode.ALL_FORMATS;
@@ -41,38 +50,40 @@ class _MyAppState extends State<MyApp> {
   Size _previewFace;
   List<Face> _faces = [];
 
+  ///
+  ///
+  ///
   @override
   void initState() {
     super.initState();
     FlutterMobileVision.start().then((previewSizes) => setState(() {
-      _previewBarcode = previewSizes[_cameraBarcode].first;
-      _previewOcr = previewSizes[_cameraOcr].first;
-      _previewFace = previewSizes[_cameraFace].first;
-    }));
+          _previewBarcode = previewSizes[_cameraBarcode].first;
+          _previewOcr = previewSizes[_cameraOcr].first;
+          _previewFace = previewSizes[_cameraFace].first;
+        }));
   }
 
+  ///
+  ///
+  ///
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      theme: new ThemeData(
+    return MaterialApp(
+      theme: ThemeData(
         primarySwatch: Colors.lime,
         buttonColor: Colors.lime,
       ),
-      home: new DefaultTabController(
+      home: DefaultTabController(
         length: 3,
-        child: new Scaffold(
-          appBar: new AppBar(
-            bottom: new TabBar(
+        child: Scaffold(
+          appBar: AppBar(
+            bottom: TabBar(
               indicatorColor: Colors.black54,
-              tabs: [
-                new Tab(text: 'Barcode'),
-                new Tab(text: 'OCR'),
-                new Tab(text: 'Face')
-              ],
+              tabs: [Tab(text: 'Barcode'), Tab(text: 'OCR'), Tab(text: 'Face')],
             ),
-            title: new Text('Flutter Mobile Vision'),
+            title: Text('Flutter Mobile Vision'),
           ),
-          body: new TabBarView(children: [
+          body: TabBarView(children: [
             _getBarcodeScreen(context),
             _getOcrScreen(context),
             _getFaceScreen(context),
@@ -90,8 +101,8 @@ class _MyAppState extends State<MyApp> {
 
     Barcode.mapFormat.forEach((key, value) {
       formatItems.add(
-        new DropdownMenuItem(
-          child: new Text(value),
+        DropdownMenuItem(
+          child: Text(value),
           value: key,
         ),
       );
@@ -106,13 +117,13 @@ class _MyAppState extends State<MyApp> {
   List<DropdownMenuItem<int>> _getCameras() {
     List<DropdownMenuItem<int>> cameraItems = [];
 
-    cameraItems.add(new DropdownMenuItem(
-      child: new Text('BACK'),
+    cameraItems.add(DropdownMenuItem(
+      child: Text('BACK'),
       value: FlutterMobileVision.CAMERA_BACK,
     ));
 
-    cameraItems.add(new DropdownMenuItem(
-      child: new Text('FRONT'),
+    cameraItems.add(DropdownMenuItem(
+      child: Text('FRONT'),
       value: FlutterMobileVision.CAMERA_FRONT,
     ));
 
@@ -130,16 +141,16 @@ class _MyAppState extends State<MyApp> {
     if (sizes != null) {
       sizes.forEach((size) {
         previewItems.add(
-          new DropdownMenuItem(
-            child: new Text(size.toString()),
+          DropdownMenuItem(
+            child: Text(size.toString()),
             value: size,
           ),
         );
       });
     } else {
       previewItems.add(
-        new DropdownMenuItem(
-          child: new Text('Empty'),
+        DropdownMenuItem(
+          child: Text('Empty'),
           value: null,
         ),
       );
@@ -154,7 +165,7 @@ class _MyAppState extends State<MyApp> {
   Widget _getBarcodeScreen(BuildContext context) {
     List<Widget> items = [];
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -163,12 +174,12 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Camera:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getCameras(),
         onChanged: (value) {
           _previewBarcode = null;
@@ -178,7 +189,7 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -187,12 +198,12 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Preview size:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getPreviewSizes(_cameraBarcode),
         onChanged: (value) {
           setState(() => _previewBarcode = value);
@@ -201,7 +212,7 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -210,66 +221,66 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Scan format only:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getFormats(),
         onChanged: (value) => setState(
-              () => _onlyFormatBarcode = value,
-            ),
+          () => _onlyFormatBarcode = value,
+        ),
         value: _onlyFormatBarcode,
       ),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Auto focus:'),
       value: _autoFocusBarcode,
       onChanged: (value) => setState(() => _autoFocusBarcode = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Torch:'),
       value: _torchBarcode,
       onChanged: (value) => setState(() => _torchBarcode = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Multiple Scan:'),
       value: _multipleBarcode,
       onChanged: (value) => setState(() {
-            _multipleBarcode = value;
-            if (value) _waitTapBarcode = true;
-          }),
+        _multipleBarcode = value;
+        if (value) _waitTapBarcode = true;
+      }),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Wait a tap to capture:'),
       value: _waitTapBarcode,
       onChanged: (value) => setState(() {
-            _waitTapBarcode = value;
-            if (!value) _multipleBarcode = false;
-          }),
+        _waitTapBarcode = value;
+        if (!value) _multipleBarcode = false;
+      }),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Show text:'),
       value: _showTextBarcode,
       onChanged: (value) => setState(() => _showTextBarcode = value),
     ));
 
     items.add(
-      new Padding(
+      Padding(
         padding: const EdgeInsets.only(
           left: 18.0,
           right: 18.0,
           bottom: 12.0,
         ),
-        child: new RaisedButton(
+        child: RaisedButton(
           onPressed: _scan,
-          child: new Text('SCAN!'),
+          child: Text('SCAN!'),
         ),
       ),
     );
@@ -279,13 +290,13 @@ class _MyAppState extends State<MyApp> {
         context: context,
         tiles: _barcodes
             .map(
-              (barcode) => new BarcodeWidget(barcode),
+              (barcode) => BarcodeWidget(barcode),
             )
             .toList(),
       ),
     );
 
-    return new ListView(
+    return ListView(
       padding: const EdgeInsets.only(
         top: 12.0,
       ),
@@ -311,7 +322,7 @@ class _MyAppState extends State<MyApp> {
         fps: 15.0,
       );
     } on Exception {
-      barcodes.add(new Barcode('Failed to get barcode.'));
+      barcodes.add(Barcode('Failed to get barcode.'));
     }
 
     if (!mounted) return;
@@ -325,7 +336,7 @@ class _MyAppState extends State<MyApp> {
   Widget _getOcrScreen(BuildContext context) {
     List<Widget> items = [];
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -334,12 +345,12 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Camera:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getCameras(),
         onChanged: (value) {
           _previewOcr = null;
@@ -349,7 +360,7 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -358,12 +369,12 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Preview size:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getPreviewSizes(_cameraOcr),
         onChanged: (value) {
           setState(() => _previewOcr = value);
@@ -372,46 +383,46 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Auto focus:'),
       value: _autoFocusOcr,
       onChanged: (value) => setState(() => _autoFocusOcr = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Torch:'),
       value: _torchOcr,
       onChanged: (value) => setState(() => _torchOcr = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Return all texts:'),
       value: _multipleOcr,
       onChanged: (value) => setState(() => _multipleOcr = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Capture when tap screen:'),
       value: _waitTapOcr,
       onChanged: (value) => setState(() => _waitTapOcr = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Show text:'),
       value: _showTextOcr,
       onChanged: (value) => setState(() => _showTextOcr = value),
     ));
 
     items.add(
-      new Padding(
+      Padding(
         padding: const EdgeInsets.only(
           left: 18.0,
           right: 18.0,
           bottom: 12.0,
         ),
-        child: new RaisedButton(
+        child: RaisedButton(
           onPressed: _read,
-          child: new Text('READ!'),
+          child: Text('READ!'),
         ),
       ),
     );
@@ -421,13 +432,13 @@ class _MyAppState extends State<MyApp> {
         context: context,
         tiles: _textsOcr
             .map(
-              (ocrText) => new OcrTextWidget(ocrText),
+              (ocrText) => OcrTextWidget(ocrText),
             )
             .toList(),
       ),
     );
 
-    return new ListView(
+    return ListView(
       padding: const EdgeInsets.only(
         top: 12.0,
       ),
@@ -452,7 +463,7 @@ class _MyAppState extends State<MyApp> {
         fps: 2.0,
       );
     } on Exception {
-      texts.add(new OcrText('Failed to recognize text.'));
+      texts.add(OcrText('Failed to recognize text.'));
     }
 
     if (!mounted) return;
@@ -466,7 +477,7 @@ class _MyAppState extends State<MyApp> {
   Widget _getFaceScreen(BuildContext context) {
     List<Widget> items = [];
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -475,12 +486,12 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Camera:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getCameras(),
         onChanged: (value) {
           _previewFace = null;
@@ -490,7 +501,7 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         top: 8.0,
         left: 18.0,
@@ -499,12 +510,12 @@ class _MyAppState extends State<MyApp> {
       child: const Text('Preview size:'),
     ));
 
-    items.add(new Padding(
+    items.add(Padding(
       padding: const EdgeInsets.only(
         left: 18.0,
         right: 18.0,
       ),
-      child: new DropdownButton(
+      child: DropdownButton(
         items: _getPreviewSizes(_cameraFace),
         onChanged: (value) {
           setState(() => _previewFace = value);
@@ -513,40 +524,40 @@ class _MyAppState extends State<MyApp> {
       ),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Auto focus:'),
       value: _autoFocusFace,
       onChanged: (value) => setState(() => _autoFocusFace = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Torch:'),
       value: _torchFace,
       onChanged: (value) => setState(() => _torchFace = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Multiple:'),
       value: _multipleFace,
       onChanged: (value) => setState(() => _multipleFace = value),
     ));
 
-    items.add(new SwitchListTile(
+    items.add(SwitchListTile(
       title: const Text('Show text:'),
       value: _showTextFace,
       onChanged: (value) => setState(() => _showTextFace = value),
     ));
 
     items.add(
-      new Padding(
+      Padding(
         padding: const EdgeInsets.only(
           left: 18.0,
           right: 18.0,
           bottom: 12.0,
         ),
-        child: new RaisedButton(
+        child: RaisedButton(
           onPressed: _face,
-          child: new Text('DETECT!'),
+          child: Text('DETECT!'),
         ),
       ),
     );
@@ -554,18 +565,12 @@ class _MyAppState extends State<MyApp> {
     items.addAll(
       ListTile.divideTiles(
         context: context,
-        tiles: _faces
-            .map(
-              (face) => new FaceWidget(face),
-            )
-            .toList(),
+        tiles: _faces.map((face) => FaceWidget(face)).toList(),
       ),
     );
 
-    return new ListView(
-      padding: const EdgeInsets.only(
-        top: 12.0,
-      ),
+    return ListView(
+      padding: const EdgeInsets.only(top: 12.0),
       children: items,
     );
   }
@@ -586,7 +591,7 @@ class _MyAppState extends State<MyApp> {
         fps: 15.0,
       );
     } on Exception {
-      faces.add(new Face(-1));
+      faces.add(Face(-1));
     }
 
     if (!mounted) return;
@@ -605,19 +610,17 @@ class BarcodeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ListTile(
+    return ListTile(
       leading: const Icon(Icons.star),
-      title: new Text(barcode.displayValue),
-      subtitle: new Text(
-        '${barcode.getFormatString()} (${barcode.format}) - '
-            '${barcode.getValueFormatString()} (${barcode.valueFormat})',
-      ),
+      title: Text(barcode.displayValue),
+      subtitle: Text('${barcode.getFormatString()} (${barcode.format}) - '
+          '${barcode.getValueFormatString()} (${barcode.valueFormat})'),
       trailing: const Icon(Icons.arrow_forward),
       onTap: () => Navigator.of(context).push(
-            new MaterialPageRoute(
-              builder: (context) => new BarcodeDetail(barcode),
-            ),
-          ),
+        MaterialPageRoute(
+          builder: (context) => BarcodeDetail(barcode),
+        ),
+      ),
     );
   }
 }
@@ -632,16 +635,16 @@ class OcrTextWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ListTile(
+    return ListTile(
       leading: const Icon(Icons.title),
-      title: new Text(ocrText.value),
-      subtitle: new Text(ocrText.language),
+      title: Text(ocrText.value),
+      subtitle: Text(ocrText.language),
       trailing: const Icon(Icons.arrow_forward),
       onTap: () => Navigator.of(context).push(
-            new MaterialPageRoute(
-              builder: (context) => new OcrTextDetail(ocrText),
-            ),
-          ),
+        MaterialPageRoute(
+          builder: (context) => OcrTextDetail(ocrText),
+        ),
+      ),
     );
   }
 }
@@ -656,15 +659,15 @@ class FaceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new ListTile(
+    return ListTile(
       leading: const Icon(Icons.face),
-      title: new Text(face.id.toString()),
+      title: Text(face.id.toString()),
       trailing: const Icon(Icons.arrow_forward),
       onTap: () => Navigator.of(context).push(
-            new MaterialPageRoute(
-              builder: (context) => new FaceDetail(face),
-            ),
-          ),
+        MaterialPageRoute(
+          builder: (context) => FaceDetail(face),
+        ),
+      ),
     );
   }
 }

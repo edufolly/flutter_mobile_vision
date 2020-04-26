@@ -62,7 +62,7 @@ Liked? :star: Star the repo to support the project!
 ### Your feature isn't listed? Open a issue right now!
 
 ## Screenshots
-<img src="docs/flutter_01.png" height="300em"/> <img src="docs/flutter_02.png" height="300em"/> <img src="docs/flutter_03.png" height="300em"/> <img src="docs/flutter_04.png" height="300em"/> <img src="docs/flutter_05.png" height="300em"/> <img src="docs/flutter_06.png" height="300em"/> <img src="docs/flutter_07.png" height="300em"/> <img src="docs/flutter_08.png" height="300em"/>
+<img src="assets/flutter_01.png" height="300em"/> <img src="assets/flutter_02.png" height="300em"/> <img src="assets/flutter_03.png" height="300em"/> <img src="assets/flutter_04.png" height="300em"/> <img src="assets/flutter_05.png" height="300em"/> <img src="assets/flutter_06.png" height="300em"/> <img src="assets/flutter_07.png" height="300em"/> <img src="assets/flutter_08.png" height="300em"/>
 
 ## Usage
 
