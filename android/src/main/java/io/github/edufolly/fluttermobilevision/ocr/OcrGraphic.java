@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.edufolly.flutter_mobile_vision.ocr;
+package io.github.edufolly.fluttermobilevision.ocr;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -26,7 +26,7 @@ import com.google.android.gms.vision.text.TextBlock;
 
 import java.util.List;
 
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 /**
  * Graphic instance for rendering TextBlock position, size, and ID within an associated graphic

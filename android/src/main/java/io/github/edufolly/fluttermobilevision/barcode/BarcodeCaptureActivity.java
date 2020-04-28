@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.barcode;
+package io.github.edufolly.fluttermobilevision.barcode;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +12,9 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.util.ArrayList;
 
-import io.github.edufolly.flutter_mobile_vision.ui.CameraSource;
-import io.github.edufolly.flutter_mobile_vision.util.AbstractCaptureActivity;
-import io.github.edufolly.flutter_mobile_vision.util.MobileVisionException;
+import io.github.edufolly.fluttermobilevision.ui.CameraSource;
+import io.github.edufolly.fluttermobilevision.util.AbstractCaptureActivity;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 
 public final class BarcodeCaptureActivity extends AbstractCaptureActivity<BarcodeGraphic>

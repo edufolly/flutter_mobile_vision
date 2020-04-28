@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.ocr;
+package io.github.edufolly.fluttermobilevision.face;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,29 +8,32 @@ import android.hardware.Camera;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.android.gms.vision.face.FaceDetector;
 
 import java.util.ArrayList;
 
-import io.github.edufolly.flutter_mobile_vision.ui.CameraSource;
-import io.github.edufolly.flutter_mobile_vision.util.AbstractCaptureActivity;
-import io.github.edufolly.flutter_mobile_vision.util.MobileVisionException;
+import io.github.edufolly.fluttermobilevision.ui.CameraSource;
+import io.github.edufolly.fluttermobilevision.util.AbstractCaptureActivity;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
-public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic> {
+public final class FaceCaptureActivity extends AbstractCaptureActivity<FaceGraphic> {
+
 
     @SuppressLint("InlinedApi")
     protected void createCameraSource() throws MobileVisionException {
         Context context = getApplicationContext();
 
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(context)
+        // TODO: Verify attributes.
+        FaceDetector faceDetector = new FaceDetector.Builder(context)
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
-        OcrTrackerFactory ocrTrackerFactory = new OcrTrackerFactory(graphicOverlay, showText);
+        FaceTrackerFactory faceTrackerFactory = new FaceTrackerFactory(graphicOverlay, showText);
 
-        textRecognizer.setProcessor(
-                new MultiProcessor.Builder<>(ocrTrackerFactory).build());
+        faceDetector.setProcessor(
+                new MultiProcessor.Builder<>(faceTrackerFactory).build());
 
-        if (!textRecognizer.isOperational()) {
+        if (!faceDetector.isOperational()) {
             IntentFilter lowStorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
             boolean hasLowStorage = registerReceiver(null, lowStorageFilter) != null;
 
@@ -40,7 +43,7 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
         }
 
         cameraSource = new CameraSource
-                .Builder(getApplicationContext(), textRecognizer)
+                .Builder(getApplicationContext(), faceDetector)
                 .setFacing(camera)
                 .setRequestedPreviewSize(previewWidth, previewHeight)
                 .setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null)
@@ -50,20 +53,16 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
     }
 
     protected boolean onTap(float rawX, float rawY) {
-        if(!waitTap) {
-            return false;
-        }
-
-        ArrayList<MyTextBlock> list = new ArrayList<>();
+        ArrayList<MyFace> list = new ArrayList<>();
 
         if (multiple) {
-            for (OcrGraphic graphic : graphicOverlay.getGraphics()) {
-                list.add(new MyTextBlock(graphic.getTextBlock()));
+            for (FaceGraphic graphic : graphicOverlay.getGraphics()) {
+                list.add(new MyFace(graphic.getFace()));
             }
         } else {
-            OcrGraphic graphic = graphicOverlay.getBest(rawX, rawY);
-            if (graphic != null && graphic.getTextBlock() != null) {
-                list.add(new MyTextBlock(graphic.getTextBlock()));
+            FaceGraphic graphic = graphicOverlay.getBest(rawX, rawY);
+            if (graphic != null && graphic.getFace() != null) {
+                list.add(new MyFace(graphic.getFace()));
             }
         }
 

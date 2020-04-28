@@ -1,10 +1,10 @@
-package io.github.edufolly.flutter_mobile_vision.face;
+package io.github.edufolly.fluttermobilevision.face;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 
 class FaceGraphicTracker extends Tracker<Face> {

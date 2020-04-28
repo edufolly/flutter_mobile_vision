@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.edufolly.flutter_mobile_vision.face;
+package io.github.edufolly.fluttermobilevision.face;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -22,7 +22,7 @@ import android.graphics.RectF;
 
 import com.google.android.gms.vision.face.Face;
 
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 /**
  * Graphic instance for rendering face position, orientation, and landmarks within an associated

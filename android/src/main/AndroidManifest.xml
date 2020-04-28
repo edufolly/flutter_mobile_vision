@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.github.edufolly.flutter_mobile_vision">
+    package="io.github.edufolly.fluttermobilevision">
 
     <uses-feature android:name="android.hardware.camera" />
 

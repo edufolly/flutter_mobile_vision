@@ -1,7 +1,6 @@
 name: flutter_mobile_vision
 description: Flutter implementation for Google Mobile Vision. Scan Barcodes, Recognize Text and Detect Faces.
-version: 0.1.4
-author: Eduardo Folly <edufolly@gmail.com>
+version: 0.1.4+1
 homepage: https://github.com/edufolly/flutter_mobile_vision
 
 environment:
@@ -20,7 +19,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: io.github.edufolly.flutter_mobile_vision
+        package: io.github.edufolly.fluttermobilevision
         pluginClass: FlutterMobileVisionPlugin
 #      ios:
 #        pluginClass: FlutterMobileVisionPlugin

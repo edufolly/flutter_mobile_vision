@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.ocr;
+package io.github.edufolly.fluttermobilevision.ocr;
 
 import android.util.Log;
 
@@ -6,7 +6,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.text.TextBlock;
 
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 public class OcrTrackerFactory implements MultiProcessor.Factory<TextBlock> {
     private GraphicOverlay<OcrGraphic> graphicOverlay;

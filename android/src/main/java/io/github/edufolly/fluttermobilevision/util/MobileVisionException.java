@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.util;
+package io.github.edufolly.fluttermobilevision.util;
 
 public class MobileVisionException extends Exception {
 

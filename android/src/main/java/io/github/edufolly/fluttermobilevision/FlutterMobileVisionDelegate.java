@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision;
+package io.github.edufolly.fluttermobilevision;
 
 import android.Manifest;
 import android.app.Activity;
@@ -22,13 +22,13 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener;
 import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
-import io.github.edufolly.flutter_mobile_vision.barcode.BarcodeCaptureActivity;
-import io.github.edufolly.flutter_mobile_vision.face.FaceCaptureActivity;
-import io.github.edufolly.flutter_mobile_vision.face.MyFace;
-import io.github.edufolly.flutter_mobile_vision.ocr.MyTextBlock;
-import io.github.edufolly.flutter_mobile_vision.ocr.OcrCaptureActivity;
-import io.github.edufolly.flutter_mobile_vision.ui.CameraSource;
-import io.github.edufolly.flutter_mobile_vision.util.AbstractCaptureActivity;
+import io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity;
+import io.github.edufolly.fluttermobilevision.face.FaceCaptureActivity;
+import io.github.edufolly.fluttermobilevision.face.MyFace;
+import io.github.edufolly.fluttermobilevision.ocr.MyTextBlock;
+import io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity;
+import io.github.edufolly.fluttermobilevision.ui.CameraSource;
+import io.github.edufolly.fluttermobilevision.util.AbstractCaptureActivity;
 
 public class FlutterMobileVisionDelegate
         implements ActivityResultListener, RequestPermissionsResultListener {

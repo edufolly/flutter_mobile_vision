@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision;
+package io.github.edufolly.fluttermobilevision;
 
 import android.app.Activity;
 import android.os.Handler;

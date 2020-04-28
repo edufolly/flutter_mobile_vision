@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.edufolly.flutter_mobile_vision.ui;
+package io.github.edufolly.fluttermobilevision.ui;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -48,7 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.edufolly.flutter_mobile_vision.util.MobileVisionException;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 
 // Note: This requires Google Play Services 8.1 or higher, due to using indirect byte buffers for

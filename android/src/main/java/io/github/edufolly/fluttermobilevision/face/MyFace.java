@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.face;
+package io.github.edufolly.fluttermobilevision.face;
 
 import android.os.Parcel;
 import android.os.Parcelable;
