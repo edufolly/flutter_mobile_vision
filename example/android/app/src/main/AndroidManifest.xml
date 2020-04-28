@@ -56,9 +56,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="io.github.edufolly.flutter_mobile_vision.barcode.BarcodeCaptureActivity" />
-        <activity android:name="io.github.edufolly.flutter_mobile_vision.ocr.OcrCaptureActivity" />
-        <activity android:name="io.github.edufolly.flutter_mobile_vision.face.FaceCaptureActivity" />
+        <activity android:name="io.github.edufolly.fluttermobilevision.barcode.BarcodeCaptureActivity" />
+        <activity android:name="io.github.edufolly.fluttermobilevision.ocr.OcrCaptureActivity" />
+        <activity android:name="io.github.edufolly.fluttermobilevision.face.FaceCaptureActivity" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

@@ -1,3 +1,8 @@
+## [0.1.4+1] - 2020-04-28
+
+* Rename the plugin package.
+
+
 ## [0.1.4] - 2020-04-25
 
 * Project structure update.

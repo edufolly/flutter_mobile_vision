@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.face;
+package io.github.edufolly.fluttermobilevision.face;
 
 import android.util.Log;
 
@@ -6,7 +6,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 public class FaceTrackerFactory implements MultiProcessor.Factory<Face> {
     private GraphicOverlay<FaceGraphic> graphicOverlay;

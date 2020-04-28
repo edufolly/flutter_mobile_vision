@@ -1,10 +1,10 @@
-package io.github.edufolly.flutter_mobile_vision.ocr;
+package io.github.edufolly.fluttermobilevision.ocr;
 
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.text.TextBlock;
 
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 class OcrGraphicTracker extends Tracker<TextBlock> {
 

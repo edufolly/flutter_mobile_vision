@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.ocr;
+package io.github.edufolly.fluttermobilevision.ocr;
 
 import android.graphics.Rect;
 import android.os.Parcel;

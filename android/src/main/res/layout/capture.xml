@@ -6,17 +6,17 @@
     android:keepScreenOn="true"
     android:orientation="vertical">
 
-    <io.github.edufolly.flutter_mobile_vision.ui.CameraSourcePreview
+    <io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay
+        <io.github.edufolly.fluttermobilevision.ui.GraphicOverlay
             android:id="@+id/graphic_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </io.github.edufolly.flutter_mobile_vision.ui.CameraSourcePreview>
+    </io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview>
 
 
 </LinearLayout>

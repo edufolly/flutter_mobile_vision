@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.util;
+package io.github.edufolly.fluttermobilevision.util;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,10 +15,10 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 
 import java.io.IOException;
 
-import io.github.edufolly.flutter_mobile_vision.R;
-import io.github.edufolly.flutter_mobile_vision.ui.CameraSource;
-import io.github.edufolly.flutter_mobile_vision.ui.CameraSourcePreview;
-import io.github.edufolly.flutter_mobile_vision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.R;
+import io.github.edufolly.fluttermobilevision.ui.CameraSource;
+import io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview;
+import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
 
 public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
         extends Activity {

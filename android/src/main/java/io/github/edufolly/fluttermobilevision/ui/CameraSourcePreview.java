@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.edufolly.flutter_mobile_vision.ui;
+package io.github.edufolly.fluttermobilevision.ui;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -27,7 +27,7 @@ import com.google.android.gms.common.images.Size;
 
 import java.io.IOException;
 
-import io.github.edufolly.flutter_mobile_vision.util.MobileVisionException;
+import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
 
 public class CameraSourcePreview extends ViewGroup {
     private static final String TAG = "CameraSourcePreview";

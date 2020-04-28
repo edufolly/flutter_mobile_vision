@@ -1,4 +1,4 @@
-package io.github.edufolly.flutter_mobile_vision.barcode;
+package io.github.edufolly.fluttermobilevision.barcode;
 
 import androidx.annotation.UiThread;
 
