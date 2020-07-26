@@ -24,7 +24,7 @@ class _OcrTextDetailState extends State<OcrTextDetail> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Face Details'),
+        title: const Text('OCR Details'),
       ),
       body: ListView(
         children: <Widget>[
