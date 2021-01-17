@@ -49,7 +49,7 @@ public class ScanAreaGraphic extends GraphicOverlay.Graphic {
 
     private int scanAreaHeight;
     private int scanAreaWidth;
-
+    private RectF rect;
 
     public ScanAreaGraphic(GraphicOverlay overlay, int scanAreaHeight, int scanAreaWidth) {
         super(overlay);
@@ -60,9 +60,8 @@ public class ScanAreaGraphic extends GraphicOverlay.Graphic {
         postInvalidate();
     }
 
-    // Unused
     public RectF getBoundingBox() {
-        return new RectF();
+        return this.rect;
     }
 
     /**
@@ -79,7 +78,7 @@ public class ScanAreaGraphic extends GraphicOverlay.Graphic {
         int top = centerOfCanvas.y - (rectH / 2);
         int right = centerOfCanvas.x + (rectW / 2);
         int bottom = centerOfCanvas.y + (rectH / 2);
-        RectF rect = new RectF(left, top, right, bottom);
-        canvas.drawRect(rect, rectPaint);
+        this.rect = new RectF(left, top, right, bottom);
+        canvas.drawRect(this.rect, rectPaint);
     }
 }
