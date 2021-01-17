@@ -43,6 +43,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
     protected CameraSource cameraSource;
     protected CameraSourcePreview preview;
     protected GraphicOverlay<T> graphicOverlay;
+    protected GraphicOverlay<ScanAreaGraphic> scanAreaOverlay;
 
     protected GestureDetector gestureDetector;
 
