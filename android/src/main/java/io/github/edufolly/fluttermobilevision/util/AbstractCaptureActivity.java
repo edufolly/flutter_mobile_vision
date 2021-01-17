@@ -19,6 +19,7 @@ import io.github.edufolly.fluttermobilevision.R;
 import io.github.edufolly.fluttermobilevision.ui.CameraSource;
 import io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview;
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.ScanAreaGraphic;
 
 public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
         extends Activity {
@@ -70,6 +71,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
 
             preview = findViewById(R.id.preview);
             graphicOverlay = findViewById(R.id.graphic_overlay);
+            scanAreaOverlay = findViewById(R.id.scan_area_overlay);
 
             autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
@@ -143,7 +145,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
 
         if (cameraSource != null) {
             try {
-                preview.start(cameraSource, graphicOverlay);
+                preview.start(cameraSource, graphicOverlay, scanAreaHeight, scanAreaWidth);
             } catch (IOException e) {
                 cameraSource.release();
                 cameraSource = null;
