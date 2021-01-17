@@ -25,7 +25,7 @@ public final class OcrCaptureActivity extends AbstractCaptureActivity<OcrGraphic
         TextRecognizer textRecognizer = new TextRecognizer.Builder(context)
                 .build();
 
-        OcrTrackerFactory ocrTrackerFactory = new OcrTrackerFactory(graphicOverlay, showText);
+        OcrTrackerFactory ocrTrackerFactory = new OcrTrackerFactory(graphicOverlay, showText, scanAreaHeight, scanAreaWidth, scanAreaOverlay);
 
         textRecognizer.setProcessor(
                 new MultiProcessor.Builder<>(ocrTrackerFactory).build());
