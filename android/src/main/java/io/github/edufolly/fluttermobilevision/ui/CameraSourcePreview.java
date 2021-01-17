@@ -130,7 +130,9 @@ public class CameraSourcePreview extends ViewGroup {
                     scanAreaOverlay.setCameraInfo(max, min, cameraSource.getCameraFacing());
                 }
               ScanAreaGraphic scanAreaGraphic = new ScanAreaGraphic(this.scanAreaOverlay, this.scanAreaHeight, this.scanAreaWidth);
-              scanAreaOverlay.add(scanAreaGraphic);
+              if (this.scanAreaHeight != 0 && this.scanAreaWidth != 0) {
+                  scanAreaOverlay.add(scanAreaGraphic);
+              }
             }
             startRequested = false;
         }

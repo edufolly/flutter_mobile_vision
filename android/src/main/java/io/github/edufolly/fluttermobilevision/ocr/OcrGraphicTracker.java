@@ -29,8 +29,13 @@ class OcrGraphicTracker extends Tracker<TextBlock> {
 
     @Override
     public void onUpdate(Detector.Detections<TextBlock> detections, TextBlock textBlock) {
-        // Only one ScanAreaGraphic exists in scanAreaOverlay
+        // Only one ScanAreaGraphic exists in scanAreaOverlay (if scanArea specified by flutter developer)
         ScanAreaGraphic scanAreaGraphic = this.scanAreaOverlay.getBest(0,0);
+        if (scanAreaGraphic == null) {
+          overlay.add(graphic);
+          graphic.updateItem(textBlock);
+          return;
+        }
         // Translate textBlock to scanAreaOverlay's scale 
         RectF scaledTextBlockRectF = scanAreaGraphic.translateRect(new RectF(textBlock.getBoundingBox()));
         // // Check that detected text fits within scan area in order to add
