@@ -9,6 +9,7 @@ class FlutterMobileVision {
   static const int CAMERA_FRONT = 1;
 
   static const Size PREVIEW = Size(640, 480);
+  static const Size SCAN_AREA = Size(0, 0);
 
   static final Map<int, List<Size>> _previewSizes = {};
 
@@ -46,6 +47,7 @@ class FlutterMobileVision {
     bool waitTap = false,
     bool showText = false,
     Size preview = PREVIEW,
+    Size scanArea = SCAN_AREA,
     int camera = CAMERA_BACK,
     double fps = 15.0,
   }) async {
@@ -61,6 +63,8 @@ class FlutterMobileVision {
       'showText': showText,
       'previewWidth': preview != null ? preview.width : PREVIEW.width,
       'previewHeight': preview != null ? preview.height : PREVIEW.height,
+      'scanAreaWidth': scanArea != null ? scanArea.width : SCAN_AREA.width,
+      'scanAreaHeight': scanArea != null ? scanArea.height : SCAN_AREA.height,
       'camera': camera,
       'fps': fps,
     };
@@ -80,6 +84,7 @@ class FlutterMobileVision {
     bool waitTap = false,
     bool showText = true,
     Size preview = PREVIEW,
+    Size scanArea = SCAN_AREA,
     int camera = CAMERA_BACK,
     double fps = 2.0,
   }) async {
@@ -91,6 +96,8 @@ class FlutterMobileVision {
       'showText': showText,
       'previewWidth': preview != null ? preview.width : PREVIEW.width,
       'previewHeight': preview != null ? preview.height : PREVIEW.height,
+      'scanAreaWidth': scanArea != null ? scanArea.width : SCAN_AREA.width,
+      'scanAreaHeight': scanArea != null ? scanArea.height : SCAN_AREA.height,
       'camera': camera,
       'fps': fps,
     };
@@ -109,6 +116,7 @@ class FlutterMobileVision {
     bool multiple = true,
     bool showText = true,
     Size preview = PREVIEW,
+    Size scanArea = SCAN_AREA,
     int camera = CAMERA_BACK,
     double fps = 15.0,
   }) async {
@@ -119,6 +127,8 @@ class FlutterMobileVision {
       'showText': showText,
       'previewWidth': preview != null ? preview.width : PREVIEW.width,
       'previewHeight': preview != null ? preview.height : PREVIEW.height,
+      'scanAreaWidth': scanArea != null ? scanArea.width : SCAN_AREA.width,
+      'scanAreaHeight': scanArea != null ? scanArea.height : SCAN_AREA.height,
       'camera': camera,
       'fps': fps,
     };

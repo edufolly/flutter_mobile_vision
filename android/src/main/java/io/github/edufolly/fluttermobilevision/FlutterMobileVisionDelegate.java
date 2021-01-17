@@ -52,6 +52,8 @@ public class FlutterMobileVisionDelegate
     private boolean showText = false;
     private int previewWidth = 640;
     private int previewHeight = 480;
+    private int scanAreaWidth = 0;
+    private int scanAreaHeight = 0;
     private int camera = CameraSource.CAMERA_FACING_BACK;
     private float fps = 15.0f;
 
@@ -188,6 +190,14 @@ public class FlutterMobileVisionDelegate
             previewHeight = (int) arguments.get("previewHeight");
         }
 
+        if (arguments.containsKey("scanAreaWidth")) {
+            scanAreaWidth = (int) arguments.get("scanAreaWidth");
+        }
+
+        if (arguments.containsKey("scanAreaHeight")) {
+            scanAreaHeight = (int) arguments.get("scanAreaHeight");
+        }
+
         if (arguments.containsKey("camera")) {
             camera = (int) arguments.get("camera");
         }
@@ -226,6 +236,8 @@ public class FlutterMobileVisionDelegate
         intent.putExtra(AbstractCaptureActivity.SHOW_TEXT, showText);
         intent.putExtra(AbstractCaptureActivity.PREVIEW_WIDTH, previewWidth);
         intent.putExtra(AbstractCaptureActivity.PREVIEW_HEIGHT, previewHeight);
+        intent.putExtra(AbstractCaptureActivity.SCAN_AREA_WIDTH, scanAreaWidth);
+        intent.putExtra(AbstractCaptureActivity.SCAN_AREA_HEIGHT, scanAreaHeight);
         intent.putExtra(AbstractCaptureActivity.CAMERA, camera);
         intent.putExtra(AbstractCaptureActivity.FPS, fps);
 
