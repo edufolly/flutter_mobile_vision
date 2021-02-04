@@ -19,6 +19,7 @@ import io.github.edufolly.fluttermobilevision.R;
 import io.github.edufolly.fluttermobilevision.ui.CameraSource;
 import io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview;
 import io.github.edufolly.fluttermobilevision.ui.GraphicOverlay;
+import io.github.edufolly.fluttermobilevision.ui.ScanAreaGraphic;
 
 public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
         extends Activity {
@@ -31,6 +32,8 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
     public static final String SHOW_TEXT = "SHOW_TEXT";
     public static final String PREVIEW_WIDTH = "PREVIEW_WIDTH";
     public static final String PREVIEW_HEIGHT = "PREVIEW_HEIGHT";
+    public static final String SCAN_AREA_WIDTH = "SCAN_AREA_WIDTH";
+    public static final String SCAN_AREA_HEIGHT = "SCAN_AREA_HEIGHT";
     public static final String CAMERA = "CAMERA";
     public static final String FPS = "FPS";
 
@@ -40,6 +43,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
     protected CameraSource cameraSource;
     protected CameraSourcePreview preview;
     protected GraphicOverlay<T> graphicOverlay;
+    protected GraphicOverlay<ScanAreaGraphic> scanAreaOverlay;
 
     protected GestureDetector gestureDetector;
 
@@ -50,6 +54,8 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
     protected boolean showText;
     protected int previewWidth;
     protected int previewHeight;
+    protected int scanAreaWidth;
+    protected int scanAreaHeight;
     protected int camera;
     protected float fps;
 
@@ -66,6 +72,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
 
             preview = findViewById(R.id.preview);
             graphicOverlay = findViewById(R.id.graphic_overlay);
+            scanAreaOverlay = findViewById(R.id.scan_area_overlay);
 
             autoFocus = getIntent().getBooleanExtra(AUTO_FOCUS, false);
             useFlash = getIntent().getBooleanExtra(USE_FLASH, false);
@@ -74,6 +81,8 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
             showText = getIntent().getBooleanExtra(SHOW_TEXT, false);
             previewWidth = getIntent().getIntExtra(PREVIEW_WIDTH, CameraSource.PREVIEW_WIDTH);
             previewHeight = getIntent().getIntExtra(PREVIEW_HEIGHT, CameraSource.PREVIEW_HEIGHT);
+            scanAreaWidth = getIntent().getIntExtra(SCAN_AREA_WIDTH, 0);
+            scanAreaHeight = getIntent().getIntExtra(SCAN_AREA_HEIGHT, 0);
             camera = getIntent().getIntExtra(CAMERA, CameraSource.CAMERA_FACING_BACK);
             fps = getIntent().getFloatExtra(FPS, 15.0f);
 
@@ -137,7 +146,7 @@ public abstract class AbstractCaptureActivity<T extends GraphicOverlay.Graphic>
 
         if (cameraSource != null) {
             try {
-                preview.start(cameraSource, graphicOverlay);
+                preview.start(cameraSource, graphicOverlay, scanAreaHeight, scanAreaWidth);
             } catch (IOException e) {
                 cameraSource.release();
                 cameraSource = null;

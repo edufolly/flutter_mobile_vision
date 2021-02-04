@@ -15,6 +15,10 @@
             android:id="@+id/graphic_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        <io.github.edufolly.fluttermobilevision.ui.GraphicOverlay
+            android:id="@+id/scan_area_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </io.github.edufolly.fluttermobilevision.ui.CameraSourcePreview>
 

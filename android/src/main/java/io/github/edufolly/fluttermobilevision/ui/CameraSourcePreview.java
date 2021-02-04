@@ -28,6 +28,7 @@ import com.google.android.gms.common.images.Size;
 import java.io.IOException;
 
 import io.github.edufolly.fluttermobilevision.util.MobileVisionException;
+import io.github.edufolly.fluttermobilevision.R; // for scan area
 
 public class CameraSourcePreview extends ViewGroup {
     private static final String TAG = "CameraSourcePreview";
@@ -39,6 +40,9 @@ public class CameraSourcePreview extends ViewGroup {
     private CameraSource cameraSource;
 
     private GraphicOverlay overlay;
+    private GraphicOverlay scanAreaOverlay;
+    private int scanAreaHeight;
+    private int scanAreaWidth;
 
     public CameraSourcePreview(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -74,6 +78,15 @@ public class CameraSourcePreview extends ViewGroup {
         start(cameraSource);
     }
 
+    public void start(CameraSource cameraSource, GraphicOverlay overlay, int scanAreaHeight, int scanAreaWidth)
+            throws IOException, SecurityException, MobileVisionException {
+
+        this.overlay = overlay;
+        this.scanAreaHeight = scanAreaHeight;
+        this.scanAreaWidth = scanAreaWidth;
+        start(cameraSource);
+    }
+
     public void stop() {
         if (cameraSource != null) {
             cameraSource.stop();
@@ -102,6 +115,24 @@ public class CameraSourcePreview extends ViewGroup {
                     overlay.setCameraInfo(max, min, cameraSource.getCameraFacing());
                 }
                 overlay.clear();
+            }
+            // Set up separate overlay for scan area
+            this.scanAreaOverlay = findViewById(R.id.scan_area_overlay);
+            if (this.scanAreaOverlay != null) {
+              Size size = cameraSource.getPreviewSize();
+                int min = Math.min(size.getWidth(), size.getHeight());
+                int max = Math.max(size.getWidth(), size.getHeight());
+                if (isPortraitMode()) {
+                    // Swap width and height sizes when in portrait, since it will be rotated by
+                    // 90 degrees
+                    scanAreaOverlay.setCameraInfo(min, max, cameraSource.getCameraFacing());
+                } else {
+                    scanAreaOverlay.setCameraInfo(max, min, cameraSource.getCameraFacing());
+                }
+              ScanAreaGraphic scanAreaGraphic = new ScanAreaGraphic(this.scanAreaOverlay, this.scanAreaHeight, this.scanAreaWidth);
+              if (this.scanAreaHeight != 0 && this.scanAreaWidth != 0) {
+                  scanAreaOverlay.add(scanAreaGraphic);
+              }
             }
             startRequested = false;
         }
