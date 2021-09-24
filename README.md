@@ -50,6 +50,7 @@ Liked? :star: Star the repo to support the project!
    * [x] Generalization of capture activities.
    * [x] Choose between back and front camera.
    * [x] Control camera FPS.
+   * [x] null-safety.
 
 * [ ] iOS
    * [ ] Barcode Scan

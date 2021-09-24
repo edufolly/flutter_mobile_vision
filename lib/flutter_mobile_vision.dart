@@ -28,7 +28,7 @@ class FlutterMobileVision {
   ///
   ///
   ///
-  static List<Size> getPreviewSizes(int facing) {
+  static List<Size>? getPreviewSizes(int facing) {
     if (_previewSizes.containsKey(facing)) {
       return _previewSizes[facing];
     }
